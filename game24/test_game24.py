@@ -80,15 +80,12 @@ def test_ui_menu_and_expr(capsys, test):
                     result += '/'
                 else:
                     result += l
-            print('result:', result)
             for k in result[1: ]:
                 if k == '\n':
                     break
-                final_result += k
-            print('final_result:',final_result)
+                final_result += k)
             with mock.patch.object(builtins, 'input', lambda _: final_result):
                 assert gg.ui_menu_and_expr(menu, choices, eof = True) == calc.parse(final_result)
         else:
-            print('Seems no solutions\n')
             with mock.patch.object(builtins, 'input', lambda _: 'n'):
                 assert gg.ui_menu_and_expr(menu, choices, eof = True) == 'n'
