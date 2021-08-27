@@ -92,4 +92,22 @@ def test_ui_menu_and_expr(capsys, test):
                     assert gg.ui_menu_and_expr(menu, choices, eof = True) == 'n'
     else:
         with mock.patch.object(builtins, 'input', lambda _: test):
-            assert gg.ui_menu_and_expr(menu, choices, eof = True) == test
+            assert gg.ui_menu_and_expr(menu, choices, eof = True) == test@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
+          
+          
+def test_print_result(capsys, test):
+    gg = gc()
+    hand = gg.new_hand()
+    solved = 0 
+    failed = 0 
+    hinted = 0 
+    if hand.result == 's':
+        solved += 1
+    elif hand.result == 'h':
+        hinted += 1
+    elif hand.result == 'f':
+        failed += 1
+    gg.print_result()
+    out, err = capsys.readouterr()
+    print(hand)
+    assert out == '\nTotal %d hands solved' % solved + '\nTotal %d hands solved with hint' % hinted + '\nTotal %d hands failed to solve' % failed + '\n\n'
