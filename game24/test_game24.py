@@ -79,22 +79,14 @@ def test_ui_check_answer_negative(capsys, r):
     gg = gc()
     a = r
     with mock.patch.object(builtins, 'input', lambda _: a):
+        a = '1 1 1 1'
         gg.ui_check_answer()
         out, err = capsys.readouterr()
         if len(r.split()) == 4:
             assert out == '\nSeems no solutions\n\n'
         else:
-            a = '12 12 12 12'
-            assert out == 'Invalid input!\n'
-
-
-@pytest.mark.xfail
-@pytest.mark.parametrize('r', [('1 1 1 1'), ('124 6 5 3'), ('3 2 1 2')])
-def test_ui_check_answer_negative(capsys, r):
-    with mock.patch.object(builtins, 'input', lambda _: r):
-        gc().ui_check_answer()
-        out, err = capsys.readouterr()
-        assert out == '\nSeems no solutions\n\n'
+            if a != '1 1 1 1':
+                assert out == 'Invalid input!\n'
 
 
 @pytest.mark.xfail
