@@ -47,22 +47,6 @@ def test_ui_menu(r):
        assert gc.ui_menu(menu, choices, eof = True) == r
 
 
-@pytest.mark.xfail
-@pytest.mark.parametrize('r', [('5'), ('8'), ('f'), ('')])
-def test_ui_menu_negative(capsys, r):
-    gg = gc()
-    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
-    choices = '1p2c3q'
-    a = r
-    with mock.patch.object(builtins, 'input', lambda _: a):
-        a = 'q'
-        out, err = capsys.readouterr()
-        gg.ui_menu(menu, choices, eof = True)
-        if a == r:
-            assert out == 'Invalid input!\n'
-
-
-
 @pytest.mark.xfail 
 @pytest.mark.parametrize('r, result', [('12 12 12 12', '\n12 + 12 + 12 - 12\n12 × (12 + 12) ÷ 12\n12 + 12 × 12 ÷ 12\n\n'),
                          ('1 2 4 6', '\n4 × 6 × (2 - 1)\n(2 + 6) × (4 - 1)\n\n'),
@@ -72,21 +56,6 @@ def test_ui_check_answer(capsys, r, result):
         gc().ui_check_answer()
         out, err = capsys.readouterr()
         assert out == result
-
-
-@pytest.mark.parametrize('r', [('12 12 12'), ('1 1 1 1'), (''), ('asf')])
-def test_ui_check_answer_negative(capsys, r):
-    gg = gc()
-    a = r
-    with mock.patch.object(builtins, 'input', lambda _: a):
-        a = '1 1 1 1'
-        gg.ui_check_answer()
-        out, err = capsys.readouterr()
-        if len(r.split()) == 4:
-            assert out == '\nSeems no solutions\n\n'
-        else:
-            if a != '1 1 1 1':
-                assert out == 'Invalid input!\n'
 
 
 @pytest.mark.xfail
