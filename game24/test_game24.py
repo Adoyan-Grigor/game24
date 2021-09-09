@@ -3,10 +3,12 @@ import pytest
 import mock
 import builtins
 import sys
+import random
 
 
 from game24.gameconsole import GameConsole as gc
 from game24.game import Game as gm
+from game24.game import Hand
 from game24 import hellp as hl
 from . import calc
 
@@ -113,3 +115,29 @@ def test_print_result(capsys, test):
     gg.print_result()
     out, err = capsys.readouterr()
     assert out == '\nTotal %d hands solved' % solved + '\nTotal %d hands solved with hint' % hinted + '\nTotal %d hands failed to solve' % failed + '\n\n'
+
+
+
+def test_play(capsys):
+    class MockGame(gc, Hand):
+        def new_hand(self):
+            if self.is_set_end():
+                return None
+
+            cards = []
+            self.cards = hl.hellp_new_hand_cards(self.cards)
+            for i in range(self.count):
+                idx = random.randint(0, len(self.cards) - 1)
+                cards.append(self.cards.pop(idx))
+            self.hand = Hand(cards, target=self.target)
+            self.hands.append(self.hand)
+            return self.hand
+
+
+    gg = MockGame()
+    gg.new_hand()
+    sc = ' '.join([str(i) for i in gg.hand.integers])
+    r = hl.hellp_ui_check_answer(capsys, sc) 
+    answers = (i for i in (r, 'n', r, 'n', 's', 'n', r, 'n', r, 'n', 'h', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        assert gg.play() == None
