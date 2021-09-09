@@ -47,7 +47,6 @@ def hellp_new_hand_cards(cards):
     llist = []
     for i in range(len(cards[44: 48])):
         llist.append(cards[i])
-    print(llist)
     cards = []
     while len(cards) < 53:
         for i in llist:
