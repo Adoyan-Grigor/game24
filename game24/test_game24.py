@@ -49,6 +49,19 @@ def test_ui_menu(r):
        assert gc.ui_menu(menu, choices, eof = True) == r
 
 
+@pytest.mark.xfail
+@pytest.mark.parametrize('r', [('w'), ('T'), (''), ('#'), ('ccs'), ('8'), ('78')])
+def test_ui_menu_negative(r, capsys):
+    gg = gc()
+    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
+    choices = '1p2c3q'
+    answers = (i for i in (r, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        gg.ui_menu(menu, choices, eof = True)
+        out, err = capsys.readouterr()
+        assert out == ('-' * 50) + '\n' + menu + '\n' + ('-' * 50) + '\nInvalid input!\n\n'
+      
+      
 @pytest.mark.xfail 
 @pytest.mark.parametrize('r, result', [('12 12 12 12', '\n12 + 12 + 12 - 12\n12 × (12 + 12) ÷ 12\n12 + 12 × 12 ÷ 12\n\n'),
                          ('1 2 4 6', '\n4 × 6 × (2 - 1)\n(2 + 6) × (4 - 1)\n\n'),
