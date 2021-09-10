@@ -85,24 +85,11 @@ def test_ui_check_answer_negative(capsys, r, err_type):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5), ('h'), ('s'), ('b'), ('q')])
+@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5), ('h'), ('s'), ('b'), ('q'), ('n')])
 def test_ui_menu_and_expr(capsys, test):
-    class MockGame(gc):
-        def new_hand(self):
-            if self.is_set_end():
-                return None
-
-            cards = []
-            for i in range(self.count):
-                idx = 0
-                cards.append(self.cards.pop(idx))
-            hand = Hand(cards, target=self.target)
-            self.hands.append(hand)
-            return hand
-
     menu = '1. Definitely no solutions (n)\n2. Give me a hint (h)\n3. I gave up, show me the answer (s)\n4. Back to the main menu (b)\n5. Quit the game (q)'
     choices = '1n2h3s4b5q'
-    gg = MockGame()
+    gg = gc()
     hand = gg.new_hand()
     hand_ints = hand.integers
     hand_ui_check = ''
@@ -155,7 +142,7 @@ def test_print_result(capsys, test):
 
 
 @pytest.mark.xfail
-def test_play(capsys):
+def test_play_1(capsys):
     class MockGame(gc, Hand):
         def new_hand(self):
             if self.is_set_end():
@@ -178,3 +165,45 @@ def test_play(capsys):
     answers = (i for i in (r, 'n', r, 'n', 's', 'n', r, 'n', r, 'n', 'h', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         assert gg.play() == None
+
+
+@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('2', 2), ('h', 2), ('3', 3), ('s', 3)])
+def test_play_2(capsys, r, t_type):
+    class MockGame(gc, Hand):
+        def new_hand(self):
+            if self.is_set_end():
+                return None
+
+            cards = []
+            self.cards = hl.hellp_new_hand_cards(self.cards)
+            for i in range(self.count):
+                idx = 0
+                cards.append(self.cards.pop(idx))
+            self.hand = Hand(cards, target=self.target)
+            self.hands.append(self.hand)
+            return self.hand
+
+
+    gg = MockGame()
+    gg.new_hand()
+    cs = ' '.join([str(i) for i in gg.hand.integers])
+    sc = hl.hellp_ui_check_answer(capsys, cs)
+    if t_type == 1:
+        answers = (i for i in (r, 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert 'Good Job' in out
+    elif t_type == 2:
+        answers = (i for i in (r, 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert "Seems no solutions" in out
+    elif t_type == 3:
+        answers = (i for i in (r, r, r, r, 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)) :
+            gg.play()
+            out, err = capsys.readouterr()
+            assert "Seems no solutions" in out
+
