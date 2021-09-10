@@ -125,7 +125,7 @@ def test_ui_menu_and_expr(capsys, test):
 
 @pytest.mark.xfail
 @pytest.mark.parametrize('r, err_type', [('1 + 1 + 1 + 1', 1), ('1 + 1 + 1 + 1 + 1', 2), ('1111', 3), ('R', 4), ('rfwg', 4), ('12 + 12 + 12 + 12', 2), ('1 1 1 1', 5)])
-def test_ui_menu_and_expr(capsys, r, err_type):
+def test_ui_menu_and_expr_negative(capsys, r, err_type):
     class MockGame(gc, Hand):
         def new_hand(self):
             if self.is_set_end():
