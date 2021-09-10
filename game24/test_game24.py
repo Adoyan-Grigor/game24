@@ -123,6 +123,45 @@ def test_ui_menu_and_expr(capsys, test):
             assert gg.ui_menu_and_expr(menu, choices, eof = True) == test
 
 
+@pytest.mark.xfail
+@pytest.mark.parametrize('r, err_type', [('1 + 1 + 1 + 1', 1), ('1 + 1 + 1 + 1 + 1', 2), ('1111', 3), ('R', 4), ('rfwg', 4), ('12 + 12 + 12 + 12', 2), ('1 1 1 1', 5)])
+def test_ui_menu_and_expr(capsys, r, err_type):
+    class MockGame(gc, Hand):
+        def new_hand(self):
+            if self.is_set_end():
+                return None
+
+            cards = []
+            for i in range(self.count):
+                idx = 0
+                cards.append(self.cards.pop(idx))
+            hand = Hand(cards, target=self.target)
+            self.hands.append(hand)
+            self.hand = hand
+            return self.hand
+    
+    gg = MockGame()
+    answers = (i for i in (r, 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        gg.play()
+        out, err = capsys.readouterr()
+        if err_type == 1:
+            assert "Sorry! It's not correct!" in out
+        elif err_type == 2:
+            assert 'Invalid integer: ' in out
+        elif err_type == 3:
+            assert 'Invalid expression: operator missed' in out
+        elif err_type == 4:
+            assert 'Invalid character: ' + r[0] in out
+        elif err_type == 5:
+            assert 'Invalid token' in out
+
+        
+        
+
+
+
+
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
 def test_print_result(capsys, test):
     gg = gc()
@@ -166,6 +205,7 @@ def test_play_1(capsys):
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         assert gg.play() == None
 
+
 @pytest.mark.xfail
 @pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('2', 2), ('h', 2), ('3', 3), ('s', 3)])
 def test_play_2(capsys, r, t_type):
@@ -206,4 +246,5 @@ def test_play_2(capsys, r, t_type):
             gg.play()
             out, err = capsys.readouterr()
             assert "Seems no solutions" in out
+
 
