@@ -156,7 +156,7 @@ def test_ui_menu_and_expr_negative(capsys, r, err_type):
         elif err_type == 5:
             assert 'Invalid token' in out
 
-
+        
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
 def test_print_result(capsys, test):
     gg = gc()
@@ -202,7 +202,7 @@ def test_play_1(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('2', 2), ('h', 2), ('3', 3), ('s', 3)])
+@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('2', 2), ('h', 2), ('3', 3), ('s', 3), ('q', 4)])
 def test_play_2(capsys, r, t_type):
     class MockGame(gc, Hand):
         def new_hand(self):
@@ -241,5 +241,7 @@ def test_play_2(capsys, r, t_type):
             gg.play()
             out, err = capsys.readouterr()
             assert "Seems no solutions" in out
-
+    elif t_type == 4:
+        with mock.patch.object(builtins, 'input', lambda _: r):
+            assert gg.play() == None
 
