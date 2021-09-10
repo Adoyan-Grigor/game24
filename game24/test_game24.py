@@ -156,11 +156,6 @@ def test_ui_menu_and_expr_negative(capsys, r, err_type):
         elif err_type == 5:
             assert 'Invalid token' in out
 
-        
-        
-
-
-
 
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
 def test_print_result(capsys, test):
