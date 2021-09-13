@@ -84,6 +84,7 @@ class Play(gc):
         5. Quit the game (q)'''
         MSG_PLAY_NO_ANSWER = 'Seems no solutions'
         INPUT_EOF = '\x00'
+        MSG_PLAY_WRONG = "Sorry! It's not correct!"
         while True:
             if not self.hands:
                 self.print_title(MSG_PLAY_NEW_SET % self.seti, dechar='*')
