@@ -4,6 +4,7 @@ import mock
 import builtins
 import sys
 import random
+import readline
 
 
 from game24.gameconsole import GameConsole as gc
@@ -38,15 +39,32 @@ def test_print_title_negativie(capsys, title, result):
 def test_raw_input_ex(input_output):
     with mock.patch.object(builtins, 'input', lambda _: input_output):
        assert gc.raw_input_ex() == input_output
-    
 
-@pytest.mark.xfail
+
+class GGameConsole(gc):
+    @staticmethod
+    def raw_input_ex(prompt='', default=''):
+        '''enhance raw_input to support default input and also flat EOF'''
+        try:
+            readline.set_startup_hook(lambda: readline.insert_text(default))
+            try:
+                return input(prompt)
+            finally:
+                readline.set_startup_hook()
+
+        except EOFError:
+            return INPUT_EOF
+    
+gc = GGameConsole
+
+
 @pytest.mark.parametrize('r', [('1'), ('2'), ('3'), ('p'), ('c'), ('q'), ('P')])
 def test_ui_menu(r):
+    gg = gc()
     menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
     choices = '1p2c3q'
     with mock.patch.object(builtins, 'input', lambda _: r):
-       assert gc.ui_menu(menu, choices, eof = True) == r
+       assert gg.ui_menu(menu, choices, eof=True) == r
 
 
 @pytest.mark.xfail
@@ -60,10 +78,8 @@ def test_ui_menu_negative(r, capsys):
         gg.ui_menu(menu, choices, eof = True)
         out, err = capsys.readouterr()
         assert out == ('-' * 50) + '\n' + menu + '\n' + ('-' * 50) + '\nInvalid input!\n\n'
-        
 
 
-@pytest.mark.xfail 
 @pytest.mark.parametrize('r, result', [('12 12 12 12', '\n12 + 12 + 12 - 12\n12 × (12 + 12) ÷ 12\n12 + 12 × 12 ÷ 12\n\n'),
                          ('1 2 4 6', '\n4 × 6 × (2 - 1)\n(2 + 6) × (4 - 1)\n\n'),
                          ('1 2 3 4', '\n4 × (1 + 2 + 3)\n1 × 2 × 3 × 4\n(1 + 3) × (2 + 4)\n\n')])
@@ -74,7 +90,6 @@ def test_ui_check_answer(capsys, r, result):
         assert out == result
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('r, err_type', [('1 1 1', 1), ('adwada', 1), ('/', 1), ('1111', 1), ('P', 1), ('12 + 12 + 12 + 12', 1), ('1 1 1 1', 2), ('1 6 7 8', 2)])
 def test_ui_check_answer_negative(capsys, r, err_type):
     gg = gc()
@@ -84,7 +99,6 @@ def test_ui_check_answer_negative(capsys, r, err_type):
         out, err = capsys.readouterr()
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5), ('h'), ('s'), ('b'), ('q'), ('n')])
 def test_ui_menu_and_expr(capsys, test):
     menu = '1. Definitely no solutions (n)\n2. Give me a hint (h)\n3. I gave up, show me the answer (s)\n4. Back to the main menu (b)\n5. Quit the game (q)'
@@ -175,7 +189,6 @@ def test_print_result(capsys, test):
     assert out == '\nTotal %d hands solved' % solved + '\nTotal %d hands solved with hint' % hinted + '\nTotal %d hands failed to solve' % failed + '\n\n'
 
 
-@pytest.mark.xfail
 def test_play_1(capsys):
     class MockGame(gc, Hand):
         def new_hand(self):
@@ -244,4 +257,3 @@ def test_play_2(capsys, r, t_type):
     elif t_type == 4:
         with mock.patch.object(builtins, 'input', lambda _: r):
             assert gg.play() == None
-
