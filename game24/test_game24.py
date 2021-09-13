@@ -271,3 +271,16 @@ def test_play_3(capsys):
         gg.play()
         out, err = capsys.readouterr()
         assert 'Set end, your result' in out
+
+
+def test_play_4_isinstance(capsys):
+    gg = hl.Play('3 3 3 3') 
+    answers = (i for i in ('3 * 3 * 3 - 3', 's', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: '3 3 3 3'):
+        gc().ui_check_answer
+        out, err = capsys.readouterr()
+        result = out
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        gg.play('3 3 3 3')
+        out, err = capsys.readouterr()
+        assert result in out
