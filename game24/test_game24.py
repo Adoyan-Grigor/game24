@@ -257,3 +257,17 @@ def test_play_2(capsys, r, t_type):
     elif t_type == 4:
         with mock.patch.object(builtins, 'input', lambda _: r):
             assert gg.play() == None
+
+
+def test_play_3(capsys):
+    class MockGame(gc, Hand):
+        def new_hand(self):
+            return None
+
+    gg = MockGame()
+    gg.new_hand()
+    answers = (i for i in ('1', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        gg.play()
+        out, err = capsys.readouterr()
+        assert 'Set end, your result' in out
