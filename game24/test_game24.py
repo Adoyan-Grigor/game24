@@ -326,3 +326,28 @@ def test_play_4(capsys, r):
             gg.play()
             out, err = capsys.readouterr()
             assert ass_res in out
+
+
+@pytest.mark.xfail
+@pytest.mark.parametrize('r', [('a'), ('A'), ('5'), ('safg'), ('')])
+def test_play_6(capsys, r):
+    class MockGame(gc, Hand):
+        def new_hand(self):
+            if self.is_set_end():
+                return None
+
+            cards = []
+            for i in range(self.count):
+                idx = -5
+                cards.append(self.cards.pop(idx))
+            hand = Hand(cards, target=self.target)
+            self.hands.append(hand)
+            return hand
+
+    gg = MockGame()
+    answers = (i for i in ('12 + 12 + 12 - 12', r, 'n', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        gg.play()
+        out, err = capsys.readouterr()
+        print(out)
+        assert 'Invalid input!' in out
