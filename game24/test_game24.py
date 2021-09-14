@@ -271,3 +271,41 @@ def test_play_3(capsys):
         gg.play()
         out, err = capsys.readouterr()
         assert 'Set end, your result' in out
+
+
+@pytest.mark.xfail
+@pytest.mark.parametrize('r', [(1), (2), (3)])
+def test_play_4(capsys, r):
+    class MockGame(gc, Hand):
+        def new_hand(self):
+            if self.is_set_end():
+                return None
+
+            cards = []
+            for i in range(self.count):
+                idx = -5 
+                cards.append(self.cards.pop(idx))
+            hand = Hand(cards, target=self.target)
+            self.hands.append(hand)
+            return hand
+
+    gg = gc()
+    if r == 1:
+        answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert 'Total 0 hands solved\nTotal 0 hands solved with hint\nTotal 13 hands failed to solve' in out
+    elif r == 2:
+        answers = (i for i in ('h', 's', 'h', 's', 'h', 's', 'h', 's', 'h',
+                               's', 'h', 's', 'h', 's', 'h', 's', 'h', 's',
+                               'h', 's', 'h', 's', 'h', 's', 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert 'Total 0 hands solved\nTotal 0 hands solved with hint\nTotal 13 hands failed to solve' in out
+    elif r == 3:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            assert gg.play() == None
