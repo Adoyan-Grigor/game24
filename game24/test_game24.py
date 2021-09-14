@@ -273,9 +273,8 @@ def test_play_3(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r', [(1), (2), (3), (4)])
+@pytest.mark.parametrize('r', [(1), (2), (3), (4), (5)])
 def test_play_4(capsys, r):
-    MSG_MENU_PLAY_RIGHT = '1. Try other solutions (t)\n2. Next hand (n)\n3. Show me the answers (s)\n4. Quit the game (q)'
     class MockGame(gc, Hand):
         def new_hand(self):
             if self.is_set_end():
@@ -315,4 +314,15 @@ def test_play_4(capsys, r):
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             gg.play()
             out, err = capsys.readouterr()
-            assert 'Good Job' in out
+            assert hl.hellp_res_print() in out
+    elif r == 5:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 's', 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: '12 12 12 12'):
+            gg.ui_check_answer()
+            out, err = capsys.readouterr()
+            ass_res = out
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert ass_res in out
