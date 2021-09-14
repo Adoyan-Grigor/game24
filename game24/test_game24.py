@@ -34,7 +34,6 @@ def test_print_title_negativie(capsys, title, result):
     assert out != result
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('input_output', [('name'), ('HeLlO'), (''), ('12')])
 def test_raw_input_ex(input_output):
     with mock.patch.object(builtins, 'input', lambda _: input_output):
@@ -274,8 +273,9 @@ def test_play_3(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r', [(1), (2), (3)])
+@pytest.mark.parametrize('r', [(1), (2), (3), (4)])
 def test_play_4(capsys, r):
+    MSG_MENU_PLAY_RIGHT = '1. Try other solutions (t)\n2. Next hand (n)\n3. Show me the answers (s)\n4. Quit the game (q)'
     class MockGame(gc, Hand):
         def new_hand(self):
             if self.is_set_end():
@@ -309,3 +309,10 @@ def test_play_4(capsys, r):
         answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             assert gg.play() == None
+    elif r == 4:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 't', '12 * (12 + 12) / 12', 'n', 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert 'Good Job' in out
