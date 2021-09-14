@@ -71,3 +71,6 @@ def hellp_new_hand_cards(cards):
         for i in llist:
             cards.append(i)
     return cards
+
+def hellp_res_print():
+    return 'Good Job!\n\n--------------------------------------------------\n1. Try other solutions (t)\n2. Next hand (n)\n3. Show me the answers (s)\n4. Quit the game (q)\n--------------------------------------------------\n\n--------------------------------------------------\n1. Definitely no solutions (n)\n2. Give me a hint (h)\n3. I gave up, show me the answer (s)\n4. Back to the main menu (b)\n5. Quit the game (q)\n--------------------------------------------------\n\nGood Job!'
