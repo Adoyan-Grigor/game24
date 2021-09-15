@@ -293,7 +293,7 @@ def test_play_3(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r', [(1), (2), (3), (4), (5)])
+@pytest.mark.parametrize('r', [(1), (2), (3), (4), (5), (6)])
 def test_play_4(capsys, r):
     class MockGame(gc, Hand):
         def new_hand(self):
@@ -346,6 +346,13 @@ def test_play_4(capsys, r):
             gg.play()
             out, err = capsys.readouterr()
             assert ass_res in out
+    elif r == 6:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 + 12 - 12 - 12', 'n', 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+            out, err = capsys.readouterr()
+            assert "You not only solved the problem, but also found a bug!\nPlease report to me with the cards and your solution if you don't mind." in out
 
 
 @pytest.mark.xfail
