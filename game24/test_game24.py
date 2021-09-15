@@ -41,6 +41,11 @@ def test_raw_input_ex(input_output):
 
 
 class GGameConsole(gc):
+    def __init__(self, target=24, count=4, face2ten=False, showcard=False):
+        super(gc, self).__init__(target, count, face2ten)
+        self.showcard = showcard
+
+
     @staticmethod
     def raw_input_ex(prompt='', default=''):
         '''enhance raw_input to support default input and also flat EOF'''
@@ -53,6 +58,21 @@ class GGameConsole(gc):
 
         except EOFError:
             return INPUT_EOF
+
+    
+    @staticmethod
+    def ui_menu(menu, choices, eof=True):
+        MSG_INVALID_INPUT = 'Invalid input!'
+        INPUT_EOF = '\x00'
+        MSG_SELECT = 'Your choice: '
+        '''show a menu, and return the selection'''
+        GGameConsole.print_title(menu, dechar='-')
+        while True:
+            r = GGameConsole.raw_input_ex(MSG_SELECT).strip()
+            if r.lower() in choices or (eof and r == INPUT_EOF):
+                print()
+                return r
+            print(MSG_INVALID_INPUT)
     
 gc = GGameConsole
 
@@ -63,7 +83,7 @@ def test_ui_menu(r):
     menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
     choices = '1p2c3q'
     with mock.patch.object(builtins, 'input', lambda _: r):
-       assert gg.ui_menu(menu, choices, eof=True) == r
+        assert gg.ui_menu(menu, choices, eof=True) == r
 
 
 @pytest.mark.xfail
