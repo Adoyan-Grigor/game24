@@ -8,11 +8,13 @@ import random
 import readline
 
 
-from game24.gameconsole import GameConsole as gc
+from game24.gameconsole import *
 from game24.game import Game as gm
 from game24.game import Hand
 from game24 import hellp as hl
 from game24 import calc
+
+gc = GameConsole
 
 
 @pytest.mark.parametrize('title, result',
@@ -245,7 +247,7 @@ def test_play_1(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('2', 2), ('h', 2), ('3', 3), ('s', 3), ('q', 4)])
+@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('N', 1), ('2', 2), ('h', 2), ('H', 2), ('3', 3), ('s', 3), ('S', 3), ('4', 4), ('q', 4), ('Q', 4)])
 def test_play_2(capsys, r, t_type):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
@@ -286,7 +288,8 @@ def test_play_2(capsys, r, t_type):
             out, err = capsys.readouterr()
             assert "Seems no solutions" in out
     elif t_type == 4:
-        with mock.patch.object(builtins, 'input', lambda _: r):
+        answers = (i for i in (r, 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             gg.play()
 
 
