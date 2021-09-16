@@ -43,7 +43,7 @@ def test_print_title_negativie(capsys, title, result):
 def test_raw_input_ex(input_output):
     """test of the 'raw_input_ex' function"""
     with mock.patch.object(builtins, 'input', lambda _: input_output):
-        assert gc.raw_input_ex() == input_output
+        assert gc().raw_input_ex() == input_output
 
 
 class GGameConsole(gc):
@@ -81,7 +81,7 @@ class GGameConsole(gc):
 gc = GGameConsole
 
 
-@pytest.mark.parametrize('r', [('1'), ('2'), ('3'), ('p'), ('c'), ('q'), ('P')])
+@pytest.mark.parametrize('r', [('1'), ('2'), ('3'), ('p'), ('c'), ('q'), ('P'), ('C'), ('Q')])
 def test_ui_menu(r):
     """test of the 'ui_menu' function"""
     gg = gc()
@@ -107,7 +107,8 @@ def test_ui_menu_negative(r, capsys):
 
 @pytest.mark.parametrize('r, result', [('12 12 12 12', '\n12 + 12 + 12 - 12\n12 × (12 + 12) ÷ 12\n12 + 12 × 12 ÷ 12\n\n'),
                          ('1 2 4 6', '\n4 × 6 × (2 - 1)\n(2 + 6) × (4 - 1)\n\n'),
-                         ('1 2 3 4', '\n4 × (1 + 2 + 3)\n1 × 2 × 3 × 4\n(1 + 3) × (2 + 4)\n\n')])
+                         ('1 2 3 4', '\n4 × (1 + 2 + 3)\n1 × 2 × 3 × 4\n(1 + 3) × (2 + 4)\n\n'),
+                         ('1 1 1 1', '\nSeems no solutions\n\n')])
 def test_ui_check_answer(capsys, r, result):
     """test of the 'ui_check_answer' function"""
     with mock.patch.object(builtins, 'input', lambda _: r):
