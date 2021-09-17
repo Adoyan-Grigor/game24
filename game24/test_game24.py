@@ -248,7 +248,7 @@ def test_play_1(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('N', 1), ('2', 2), ('h', 2), ('H', 2), ('3', 3), ('s', 3), ('S', 3), ('4', 4), ('q', 4), ('Q', 4)])
+@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('N', 1), ('2', 2), ('h', 2), ('H', 2), ('3', 3), ('s', 3), ('S', 3), ('4', 4), ('b', 4), ('B', 4), ('5', 5), ('q', 5), ('Q', 5)])
 def test_play_2(capsys, r, t_type):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
@@ -289,6 +289,10 @@ def test_play_2(capsys, r, t_type):
             out, err = capsys.readouterr()
             assert "Seems no solutions" in out
     elif t_type == 4:
+        answers = (i for i in (r, 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            gg.play()
+    elif t_type == 5:
         answers = (i for i in (r, 'q'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             gg.play()
@@ -376,7 +380,7 @@ def test_play_4(capsys, r):
 
 @pytest.mark.xfail
 @pytest.mark.parametrize('r', [('a'), ('A'), ('5'), ('safg'), ('')])
-def test_play_6(capsys, r):
+def test_play_5(capsys, r):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
         """Creating an analogue of the 'GameConsole' class with modified functions 'new_hand'"""
