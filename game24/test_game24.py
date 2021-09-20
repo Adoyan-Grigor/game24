@@ -394,8 +394,8 @@ def test_play_4(capsys, r):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r, err_type', [('a', 1), ('A', 1), ('5', 1), ('safg', 1), ('', 1)])
-def test_play_5(capsys, r, err_type):
+@pytest.mark.parametrize('r', [('a'), ('A'), ('5'), ('safg'), ('')])
+def test_play_5(capsys, r):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
         """Creating an analogue of the 'GameConsole' class with modified functions 'new_hand'"""
@@ -412,13 +412,11 @@ def test_play_5(capsys, r, err_type):
             return hand
 
     gg = MockGame()
-    if err_type == 1:
-        answers = (i for i in ('12 + 12 + 12 - 12', r, 'n', 'b', 'q'))
-        with pytest.raises(SystemExit):
-            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-                gg.play()
-                out, err = capsys.readouterr()
-                assert 'Invalid input!' in out
+    answers = (i for i in ('12 + 12 + 12 - 12', r, 'n', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        gg.play()
+        out, err = capsys.readouterr()
+        assert 'Invalid input!' in out
 
 
 @pytest.mark.xfail
