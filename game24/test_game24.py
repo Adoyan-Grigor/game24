@@ -27,7 +27,7 @@ def test_print_title(capsys, title, result):
     """test of the print_title function"""
     gc.print_title(title)
     out, err = capsys.readouterr()
-    assert out == result
+    assert out, err  == result
 
 
 @pytest.mark.parametrize('title, result', [(None, None), ('4 × (5 + 9 - 8)\n8 + 4 × (9 - 5)',
@@ -36,7 +36,7 @@ def test_print_title_negativie(capsys, title, result):
     """negative test of print_title function"""
     gc.print_title(title)
     out, err = capsys.readouterr()
-    assert out != result
+    assert out, err != result
 
 
 @pytest.mark.parametrize('input_output', [('name'), ('HeLlO'), (''), ('12')])
@@ -79,6 +79,7 @@ class GGameConsole(gc):
 
 
 gc = GGameConsole
+parser = hl
 
 
 @pytest.mark.parametrize('r', [('1'), ('2'), ('3'), ('p'), ('c'), ('q'), ('P'), ('C'), ('Q')])
@@ -91,7 +92,6 @@ def test_ui_menu(r):
         assert gg.ui_menu(menu, choices, eof=True) == r
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('r', [('w'), ('T'), (''), ('#'), ('ccs'), ('8'), ('78')])
 def test_ui_menu_negative(r, capsys):
     """negative test of the 'ui_menu' function"""
@@ -102,7 +102,7 @@ def test_ui_menu_negative(r, capsys):
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         gg.ui_menu(menu, choices, eof=True)
         out, err = capsys.readouterr()
-        assert out == ('-' * 50) + '\n' + menu + '\n' + ('-' * 50) + '\nInvalid input!\n\n'
+        assert out, err == ('-' * 50) + '\n' + menu + '\n' + ('-' * 50) + '\nInvalid input!\n\n'
 
 
 @pytest.mark.parametrize('r, result', [('12 12 12 12', '\n12 + 12 + 12 - 12\n12 × (12 + 12) ÷ 12\n12 + 12 × 12 ÷ 12\n\n'),
@@ -114,7 +114,7 @@ def test_ui_check_answer(capsys, r, result):
     with mock.patch.object(builtins, 'input', lambda _: r):
         gc().ui_check_answer()
         out, err = capsys.readouterr()
-        assert out == result
+        assert out, err == result
 
 
 @pytest.mark.parametrize('r', [('1 1 1'), ('adwada'), ('/'), ('1111'), ('P')])
@@ -125,7 +125,7 @@ def test_ui_check_answer_negative(capsys, r):
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         gg.ui_check_answer()
         out, err = capsys.readouterr()
-        assert 'Invalid input' in out
+        assert 'Invalid input' in out, err
 
 
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5), ('h'), ('s'), ('b'), ('q'), ('n')])
@@ -242,13 +242,14 @@ def test_play_1(capsys):
     gg.new_hand()
     sc = ' '.join([str(i) for i in gg.hand.integers])
     r = hl.hellp_ui_check_answer(capsys, sc)
-    answers = (i for i in (r, 'n', r, 'n', 's', 'n', r, 'n', r, 'n', 'h', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'b', 'q'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        gg.play()
+    answers = (i for i in (r, 'n', r, 'n', 's', 'n', r, 'n', r, 'n', 'h', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'q'))
+    with pytest.raises(SystemExit):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            assert gg.play().type == SystemExit
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('N', 1), ('2', 2), ('h', 2), ('H', 2), ('3', 3), ('s', 3), ('S', 3), ('4', 4), ('b', 4), ('B', 4), ('5', 5), ('q', 5), ('Q', 5)])
+@pytest.mark.parametrize('r, t_type', [('1', 1), ('n', 1), ('N', 1), ('2', 2), ('h', 2), ('H', 2), ('3', 3), ('s', 3), ('S', 3), ('4', 4), ('b', 4), ('B', 4), ('5', 5), ('q', 5), ('Q', 5), ('1', 6), ('n', 6), ('N', 6), ('3', 7), ('q', 7), ('Q', 7)])
 def test_play_2(capsys, r, t_type):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
@@ -293,9 +294,22 @@ def test_play_2(capsys, r, t_type):
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             gg.play()
     elif t_type == 5:
-        answers = (i for i in (r, 'q'))
+        gg = gc()
+        answers = (i for i in (r))
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                assert gg.play().type == SystemExit
+    elif t_type == 6:
+        gg = gc()
+        answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', r, 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'b', 'q'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             gg.play()
+    elif t_type == 7:
+        gg = gc()
+        answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', r))
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                assert gg.play().type == SystemExit
 
 
 def test_play_3(capsys):
@@ -349,8 +363,9 @@ def test_play_4(capsys, r):
     elif r == 3:
         gg = MockGame()
         answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            gg.play()
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                assert gg.play().type == SystemExit
     elif r == 4:
         gg = MockGame()
         answers = (i for i in ('12 + 12 + 12 - 12', 't', '12 * (12 + 12) / 12', 'n', 'b', 'q'))
@@ -379,8 +394,8 @@ def test_play_4(capsys, r):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r', [('a'), ('A'), ('5'), ('safg'), ('')])
-def test_play_5(capsys, r):
+@pytest.mark.parametrize('r, err_type', [('a', 1), ('A', 1), ('5', 1), ('safg', 1), ('', 1)])
+def test_play_5(capsys, r, err_type):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
         """Creating an analogue of the 'GameConsole' class with modified functions 'new_hand'"""
@@ -397,12 +412,13 @@ def test_play_5(capsys, r):
             return hand
 
     gg = MockGame()
-    answers = (i for i in ('12 + 12 + 12 - 12', r, 'n', 'b', 'q'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        gg.play()
-        out, err = capsys.readouterr()
-        print(out)
-        assert 'Invalid input!' in out
+    if err_type == 1:
+        answers = (i for i in ('12 + 12 + 12 - 12', r, 'n', 'b', 'q'))
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                gg.play()
+                out, err = capsys.readouterr()
+                assert 'Invalid input!' in out
 
 
 @pytest.mark.xfail
