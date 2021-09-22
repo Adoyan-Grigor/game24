@@ -79,7 +79,6 @@ class GGameConsole(gc):
 
 
 gc = GGameConsole
-parser = hl
 
 
 @pytest.mark.parametrize('r', [('1'), ('2'), ('3'), ('p'), ('c'), ('q'), ('P'), ('C'), ('Q')])
@@ -245,7 +244,7 @@ def test_play_1(capsys):
     answers = (i for i in (r, 'n', r, 'n', 's', 'n', r, 'n', r, 'n', 'h', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'n', r, 'q'))
     with pytest.raises(SystemExit):
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            assert gg.play().type == SystemExit
+            gg.play()
 
 
 @pytest.mark.xfail
@@ -298,7 +297,7 @@ def test_play_2(capsys, r, t_type):
         answers = (i for i in (r))
         with pytest.raises(SystemExit):
             with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-                assert gg.play().type == SystemExit
+                gg.play()
     elif t_type == 6:
         gg = gc()
         answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', r, 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'b', 'q'))
@@ -309,7 +308,7 @@ def test_play_2(capsys, r, t_type):
         answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', r))
         with pytest.raises(SystemExit):
             with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-                assert gg.play().type == SystemExit
+                gg.play()
 
 
 def test_play_3(capsys):
@@ -328,7 +327,7 @@ def test_play_3(capsys):
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('r', [(1), (2), (3), (4), (5), (6)])
+@pytest.mark.parametrize('r', [(1), (2), (3), (4), (5), (6), (7), (8), (9), (10)])
 def test_play_4(capsys, r):
     """test of the 'play' function"""
     class MockGame(gc, Hand):
@@ -365,7 +364,7 @@ def test_play_4(capsys, r):
         answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
         with pytest.raises(SystemExit):
             with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-                assert gg.play().type == SystemExit
+                gg.play()
     elif r == 4:
         gg = MockGame()
         answers = (i for i in ('12 + 12 + 12 - 12', 't', '12 * (12 + 12) / 12', 'n', 'b', 'q'))
@@ -391,6 +390,32 @@ def test_play_4(capsys, r):
             gg.play()
             out, err = capsys.readouterr()
             assert "You not only solved the problem, but also found a bug!\nPlease report to me with the cards and your solution if you don't mind." in out
+    elif r == 7:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', '4'))
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                gg.play()
+    elif r == 8:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                gg.play()
+    elif r == 9:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 'Q'))
+        with pytest.raises(SystemExit):
+            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+                gg.play()
+    elif r == 10:
+        gg = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', '', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                gg.play()
+            out, err = capsys.readouterr()
+            assert 'Invalid input!' in out
 
 
 @pytest.mark.xfail
