@@ -470,7 +470,8 @@ def test_main_negative(capsys, r):
         out, err = capsys.readouterr()
         assert 'Invalid input!' in out
 
-@pytest.mark.parametrize('n', [(1), (2), (3)])
+        
+@pytest.mark.parametrize('n', [(1), (2), (3), (4)])
 def test_arg_parse(n):
     """negative test of the 'arg_parse' function"""
     if n == 1:
@@ -478,7 +479,9 @@ def test_arg_parse(n):
     elif n == 2:
         r = 'namespace.interactive == True; namespace.integers = []'
     elif n == 3:
-        r = "namespace.integers.append('a') "
+        r = "namespace.integers.append('a')"
+    elif n == 4:
+        r = "namespace.integers.append('a', 'b', 'g')"
     answers = (i for i in ('s', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
                            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
                            'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
@@ -496,3 +499,6 @@ def test_arg_parse(n):
             with pytest.raises(SystemExit):
                 breakpoint()
                 arg_parse()
+        elif n == 4:
+            breakpoint()
+            arg_parse()
