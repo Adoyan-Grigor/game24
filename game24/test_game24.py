@@ -8,10 +8,10 @@ import random
 import readline
 
 
-from game24.gameconsole import *
+from .gameconsole import *
 from game24.game import Game as gm
 from game24.game import Hand
-from game24 import hellp as hl
+from . import hellp as hl
 from game24 import calc
 
 gc = GameConsole
@@ -469,3 +469,30 @@ def test_main_negative(capsys, r):
         gg.main()
         out, err = capsys.readouterr()
         assert 'Invalid input!' in out
+
+@pytest.mark.parametrize('n', [(1), (2), (3)])
+def test_arg_parse(n):
+    """negative test of the 'arg_parse' function"""
+    if n == 1:
+        r = 'namespace.integers = []'
+    elif n == 2:
+        r = 'namespace.interactive == True; namespace.integers = []'
+    elif n == 3:
+        r = "namespace.integers.append('a') "
+    answers = (i for i in ('s', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
+                           'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                           'n', r, 'n', 'n', 'n', 'argv = None', 'c'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        if n == 1 or n == 2:
+            breakpoint()
+            assert arg_parse().interactive == True
+        elif n == 3:
+            with pytest.raises(SystemExit):
+                breakpoint()
+                arg_parse()
