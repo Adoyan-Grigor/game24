@@ -502,3 +502,26 @@ def test_arg_parse(n):
         elif n == 4:
             breakpoint()
             arg_parse()
+ 
+
+@pytest.mark.parametrize('n', [(1)])
+def test_main(n):
+    """test function 'main' in non-function"""
+    if n == 1:
+        answers = (i for i in ('s', 'n', 's', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 'namespace.interactive == True',
+            'namespace.integers = []', 'n', 'n', 'n', 'argv = None',
+            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+            'n', 's', 'n', 'n', 's', 'n', 'n',
+            'GameConsole.raw_input_ex = input', 'c', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                breakpoint()
+                main()
