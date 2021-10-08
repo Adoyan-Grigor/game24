@@ -107,7 +107,7 @@ def test_ui_menu_negative(r, capsys):
 @pytest.mark.parametrize('r, result', [('12 12 12 12', '\n12 + 12 + 12 - 12\n12 × (12 + 12) ÷ 12\n12 + 12 × 12 ÷ 12\n\n'),
                          ('1 2 4 6', '\n4 × 6 × (2 - 1)\n(2 + 6) × (4 - 1)\n\n'),
                          ('1 2 3 4', '\n4 × (1 + 2 + 3)\n1 × 2 × 3 × 4\n(1 + 3) × (2 + 4)\n\n'),
-                         ('1 1 1 1', '\nSeems no solutions\n\n')])
+                         ('1 1 1 1', '\nSeems no solutions\n\n'), ('0 0 0 0', '\nSeems no solutions\n\n')])
 def test_ui_check_answer(capsys, r, result):
     """test of the 'ui_check_answer' function"""
     with mock.patch.object(builtins, 'input', lambda _: r):
@@ -377,8 +377,8 @@ def test_play_4(capsys, r):
         answers = (i for i in ('12 + 12 + 12 - 12', 's', 'b', 'q'))
         with mock.patch.object(builtins, 'input', lambda _: '12 12 12 12'):
             gg.ui_check_answer()
-            out, err = capsys.readouterr()
-            ass_res = out
+        out, err = capsys.readouterr()
+        ass_res = out
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             gg.play()
             out, err = capsys.readouterr()
@@ -399,8 +399,8 @@ def test_play_4(capsys, r):
     elif r == 8:
         gg = MockGame()
         answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
-        with pytest.raises(SystemExit):
-            with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
                 gg.play()
     elif r == 9:
         gg = MockGame()
@@ -470,17 +470,15 @@ def test_main_negative(capsys, r):
         out, err = capsys.readouterr()
         assert 'Invalid input!' in out
 
-        
-@pytest.mark.parametrize('n', [(1), (2), (3), (4)])
+
+@pytest.mark.parametrize('n', [(1), (2), (3)])
 def test_arg_parse(n):
     """negative test of the 'arg_parse' function"""
     if n == 1:
         r = 'namespace.integers = []'
     elif n == 2:
-        r = 'namespace.interactive == True; namespace.integers = []'
-    elif n == 3:
         r = "namespace.integers.append('a')"
-    elif n == 4:
+    elif n == 3:
         r = "namespace.integers.append('a', 'b', 'g')"
     answers = (i for i in ('s', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
                            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
@@ -492,36 +490,85 @@ def test_arg_parse(n):
                            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
                            'n', r, 'n', 'n', 'n', 'argv = None', 'c'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        if n == 1 or n == 2:
+        if n == 1:
             breakpoint()
             assert arg_parse().interactive == True
-        elif n == 3:
+        elif n == 2:
             with pytest.raises(SystemExit):
                 breakpoint()
                 arg_parse()
-        elif n == 4:
+        elif n == 3:
             breakpoint()
             arg_parse()
- 
 
-@pytest.mark.parametrize('n', [(1)])
-def test_main(n):
+
+@pytest.mark.parametrize('n', [(1), (2), (3), (4), (5), (6)])
+def test_main(n, capsys):
     """test function 'main' in non-function"""
     if n == 1:
         answers = (i for i in ('s', 'n', 's', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 'namespace.interactive == True',
-            'namespace.integers = []', 'n', 'n', 'n', 'argv = None',
-            'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
-            'n', 's', 'n', 'n', 's', 'n', 'n',
-            'GameConsole.raw_input_ex = input', 'c', 'q'))
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'namespace.interactive == True',
+                               'namespace.integers = []', 'n', 'n', 'n', 'argv = None',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 's', 'n', 'n', 's', 'n', 'n',
+                               'GameConsole.raw_input_ex = input', 'c', 'q'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             with pytest.raises(SystemExit):
                 breakpoint()
                 main()
+    elif n == 2:
+        answers = (i for i in ('s', 'n', 's', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'namespace.integers = ["12 + 12 + 12 + 12"]',
+                               'namespace.debug = True', 'n', 'n', 'n', 'argv = None', 'c'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                breakpoint()
+                main()
+                out, err = capsys.readouterr()
+                assert '<+ [12, 12, 12, 12]>\n12 + 12 + 12 + 12\n48\n' == out
+    elif 3 <= n <= 6:
+        if n == 3:
+            r = '"1", "2", "3", "4"'
+        elif n == 4:
+            r = '"5", "5", "5", "5"'
+        elif n == 5:
+            r = '"3", "2", "8", "3"'
+        elif n == 6:
+            r = '"1", "1", "1", "1"'
+        answers = (i for i in ('s', 'n', 's', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 's', 'n', 's', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n',
+                               'n', 'namespace.integers = [' + r + ']',
+                               'n', 'n', 'n', 'argv = None', 'c'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                breakpoint()
+                main()
+                out, err = capsys.readouterr()
+                if n == 3:
+                    assert out == '4 × (1 + 2 + 3)\n1 × 2 × 3 × 4\n(1 + 3) × (2 + 4)\n'
+                elif n == 4:
+                    assert out == '5 × 5 - 5 ÷ 5\n'
+                elif n == 5:
+                    assert out == '3 × 8 × (3 - 2)\n8 × (2 × 3 - 3)\n8 × (3 + 3) ÷ 2\n8 × (2 + 3 ÷ 3)\n'
+                elif n == 6:
+                    assert out == 'Seems no solutions\n'
