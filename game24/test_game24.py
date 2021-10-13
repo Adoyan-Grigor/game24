@@ -369,7 +369,8 @@ def test_play_2(capsys, test, t_type):
                                's', 's', 's', 's', 's',
                                's', 's', 's', test))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            g_c.play()
+            with pytest.raises(SystemExit):
+                assert g_c.play().type == SystemExit
 
 
 def test_play_3(capsys):
