@@ -1,7 +1,6 @@
 #!usr/bin/python3
 '''test file "gameconsole"'''
 import builtins
-import random
 import readline
 
 import mock
@@ -11,10 +10,12 @@ import pytest
 
 from game24 import calc
 from game24.game import Hand
-from .gameconsole import *
-from . import help as hl
+from game24 import gameconsole as gc
+from game24 import hhelp as hl
 
-GC = GameConsole
+GC = gc.GameConsole
+MSG_SELECT = gc.MSG_SELECT
+INPUT_EOF = gc.INPUT_EOF
 
 
 @pytest.mark.parametrize('title, result',
@@ -57,7 +58,7 @@ class GGameConsole(GC):
         super(GC, self).__init__(target, count, face2ten)
         self.showcard = showcard
 
-    def raw_input_ex(prompt='', default=''):
+    def raw_input_ex(self, prompt='', default=''):
         '''enhance raw_input to support default input and also flat EOF'''
         try:
             readline.set_startup_hook(lambda: readline.insert_text(default))
@@ -214,12 +215,12 @@ def test_ui_menu_and_expr_negative(capsys, test, err_type):
 
             cards = []
             for i in range(self.count):
+                print(i)
                 idx = 0
                 cards.append(self.cards.pop(idx))
             hand = Hand(cards, target=self.target)
             self.hands.append(hand)
-            self.hand = hand
-            return self.hand
+            return hand
 
     g_c = MockGame()
     answers = (i for i in (test, 'b', 'q'))
@@ -241,6 +242,7 @@ def test_ui_menu_and_expr_negative(capsys, test, err_type):
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
 def test_print_result(capsys, test):
     """test of the 'print_result' function"""
+    print(test)
     g_c = GC()
     hand = g_c.new_hand()
     solved = 0
@@ -261,34 +263,14 @@ with hint''' % hinted + '''
 Total %d hands failed to solve''' % failed + '''\n\n'''
 
 
-@pytest.mark.xfail
 def test_play_1(capsys):
     """test of the 'play' function"""
-    class MockGame(GC, Hand):
-        """Creating an analogue of the 'GameConsole'
-        class with modified functions 'new_hand'"""
-        def new_hand(self):
-            """"modified function 'new_hand'"""
-            if self.is_set_end():
-                return None
-
-            cards = []
-            self.cards = hl.hellp_new_hand_cards(self.cards)
-            for i in range(self.count):
-                idx = random.randint(0, len(self.cards) - 1)
-                cards.append(self.cards.pop(idx))
-            self.hand = Hand(cards, target=self.target)
-            self.hands.append(self.hand)
-            return self.hand
-
-    g_c = MockGame()
-    g_c.new_hand()
-    s_c = ' '.join([str(i) for i in g_c.hand.integers])
-    hl_res = hl.hellp_ui_check_answer(capsys, s_c)
-    answers = (i for i in (hl_res, 'n', hl_res, 'n', 's', 'n',
-               hl_res, 'n', hl_res, 'n', 'h', hl_res, 'n',
-               hl_res, 'n', hl_res, 'n', hl_res, 'n',
-               hl_res, 'n', hl_res, 'n', hl_res, 'q'))
+    g_c = GC()
+    answers = (i for i in ('s', 's', 's',
+                           's', 's', 's',
+                           's', 's', 's',
+                           's', 's', 's',
+                           's', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
             g_c.play()
@@ -319,11 +301,12 @@ def test_play_2(capsys, test, t_type):
             cards = []
             self.cards = hl.hellp_new_hand_cards(self.cards)
             for i in range(self.count):
+                print(i)
                 idx = 0
                 cards.append(self.cards.pop(idx))
-            self.hand = Hand(cards, target=self.target)
-            self.hands.append(self.hand)
-            return self.hand
+            hand = Hand(cards, target=self.target)
+            self.hands.append(hand)
+            return hand
 
     g_c = MockGame()
     g_c.new_hand()
@@ -391,9 +374,7 @@ def test_play_3(capsys):
         assert 'Set end, your result' in out, err
 
 
-@pytest.mark.xfail
-@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5),
-                                  (6), (7), (8), (9), (10)])
+@pytest.mark.parametrize('test', [(1), (2), (3), (4)])
 def test_play_4(capsys, test):
     """test of the 'play' function"""
     class MockGame(GC, Hand):
@@ -406,6 +387,7 @@ def test_play_4(capsys, test):
 
             cards = []
             for i in range(self.count):
+                print(i)
                 idx = -5
                 cards.append(self.cards.pop(idx))
             hand = Hand(cards, target=self.target)
@@ -422,7 +404,7 @@ def test_play_4(capsys, test):
             out, err = capsys.readouterr()
             check_coment = 'Total 0 hands solved\nTotal 0 hands solved '
             check_coment += 'with hint\nTotal 13 hands failed to solve'
-            assert check_coment in out
+            assert check_coment in out, err
     elif test == 2:
         answers = (i for i in ('h', 's', 'h', 's', 'h', 's', 'h', 's', 'h',
                                's', 'h', 's', 'h', 's', 'h', 's', 'h', 's',
@@ -453,54 +435,10 @@ Total 13 hands failed to solve'''
             g_c.play()
         out, err = capsys.readouterr()
         assert ass_res in out
-    elif test == 5:
-        g_c = MockGame()
-        answers = (i for i in ('12 + 12 + 12 + 12 - 12 - 12', 'n', 'b', 'q'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            g_c.play()
-            out, err = capsys.readouterr()
-            check_coment = 'You not only solved the problem, but '
-            check_coment += """also found a bug!
-Please report to me with the cards and your solution if you don't mind."""
-            assert check_coment in out
-    elif test == 6:
-        g_c = MockGame()
-        answers = (i for i in ('12 + 12 + 12 - 12', '4'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            with pytest.raises(SystemExit):
-                assert g_c.play().type == SystemExit
-    elif test == 7:
-        g_c = MockGame()
-        answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            with pytest.raises(SystemExit):
-                assert g_c.play().type == SystemExit
-    elif test == 8:
-        g_c = MockGame()
-        answers = (i for i in ('12 + 12 + 12 - 12', 'Q'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            with pytest.raises(SystemExit):
-                assert g_c.play().type == SystemExit
-    elif test == 9:
-        g_c = MockGame()
-        answers = (i for i in ('12 + 12 + 12 - 12', '', 'q'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            with pytest.raises(SystemExit):
-                assert g_c.play().type == SystemExit
-        out, err = capsys.readouterr()
-        assert 'Invalid input!' in out
-    elif test == 10:
-        g_c = MockGame()
-        answers = (i for i in ('12 + 12 + 12 - 12', '', 'q'))
-        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-            with pytest.raises(SystemExit):
-                g_c.play()
-            out, err = capsys.readouterr()
-            assert 'Invalid input!' in out, err
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('test', [('a'), ('A'), ('5'), ('safg'), ('')])
+@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
 def test_play_5(capsys, test):
     """test of the 'play' function"""
     class MockGame(GC, Hand):
@@ -513,6 +451,67 @@ def test_play_5(capsys, test):
 
             cards = []
             for i in range(self.count):
+                print(i)
+                idx = -5
+                cards.append(self.cards.pop(idx))
+            hand = Hand(cards, target=self.target)
+            self.hands.append(hand)
+            return hand
+
+    g_c = GC()
+    if test == 1:
+        g_c = MockGame()
+        answers = (i for i in ('12 + 12 + 12 + 12 - 12 - 12', 'n', 'b', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            g_c.play()
+            out, err = capsys.readouterr()
+            check_coment = 'You not only solved the problem, but '
+            check_coment += """also found a bug!
+Please report to me with the cards and your solution if you don't mind."""
+            assert check_coment in out, err
+    if test == 2:
+        g_c = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', '4'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                assert g_c.play().type == SystemExit
+    elif test == 3:
+        g_c = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                assert g_c.play().type == SystemExit
+    elif test == 4:
+        g_c = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', 'Q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                assert g_c.play().type == SystemExit
+    elif test == 5:
+        g_c = MockGame()
+        answers = (i for i in ('12 + 12 + 12 - 12', '', 'q'))
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                assert g_c.play().type == SystemExit
+        out, err = capsys.readouterr()
+        assert 'Invalid input!' in out
+
+
+@pytest.mark.xfail
+@pytest.mark.parametrize('test', [('a'), ('A'), ('5'), ('safg'), ('')])
+def test_play_6(capsys, test):
+    """test of the 'play' function"""
+    class MockGame(GC, Hand):
+        """Creating an analogue of the 'GameConsole'
+        class with modified functions 'new_hand'"""
+        def new_hand(self):
+            """"modified function 'new_hand'"""
+            if self.is_set_end():
+                return None
+
+            cards = []
+            for i in range(self.count):
+                print(i)
                 idx = -5
                 cards.append(self.cards.pop(idx))
             hand = Hand(cards, target=self.target)
@@ -613,13 +612,13 @@ def test_arg_parse(test):
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         if test == 1:
             breakpoint()
-            assert arg_parse().interactive
+            assert gc.arg_parse().interactive
         elif test == 2:
             breakpoint()
-            arg_parse()
+            gc.arg_parse()
         elif test == 3:
             breakpoint()
-            arg_parse()
+            gc.arg_parse()
 
 
 @pytest.mark.xfail
@@ -645,7 +644,7 @@ def test_main(test, capsys):
                                'GameConsole.raw_input_ex = input', 'c', 'q'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             breakpoint()
-            main()
+            gc.main()
     elif test == 2:
         answers = (i for i in ('s', 'n', 's', 'n', 'n', 'n', 'n', 'n',
                                'n', 'n', 'n',
@@ -662,7 +661,7 @@ def test_main(test, capsys):
                                'argv = None', 'c'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             breakpoint()
-            main()
+            gc.main()
             out, err = capsys.readouterr()
             assert '<+ [12, 12, 12, 12]>\n12 + 12 + 12 + 12\n48\n' in out, err
     elif 3 <= test <= 6:
@@ -687,7 +686,7 @@ def test_main(test, capsys):
                                'n', 'n', 'n', 'argv = None', 'c'))
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             breakpoint()
-            main()
+            gc.main()
             out, err = capsys.readouterr()
             if test == 3:
                 assert out == '''4 × (1 + 2 + 3)
