@@ -137,7 +137,7 @@ def test_ui_check_answer_negative(capsys, test):
         assert 'Invalid input' in out, err
 
 
-@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5),
+@pytest.mark.parametrize('test', [('1'), ('2'), ('3'), ('4'), ('5'),
                                   ('h'), ('s'), ('b'),
                                   ('q'), ('n')])
 def test_ui_menu_and_expr(capsys, test):
@@ -146,41 +146,35 @@ def test_ui_menu_and_expr(capsys, test):
 3. I gave up, show me the answer (s)
 4. Back to the main menu (b)
 5. Quit the game (q)'''
+    def mock_calc(numb):
+        result = ''
+        for i in numb:
+            if i == '*':
+                result += '× '
+            elif i == '/':
+                result += '÷ '
+            elif i == '(' or i == ')':
+                result += i
+            else:
+                result += str(i) + ' '
+        return result
+    calc.parse = mock_calc
     choices = '1n2h3s4b5q'
     g_c = GC()
     hand = g_c.new_hand()
     hand_ints = hand.integers
-    hand_ui_check = ''
-    result = ''
-    f_res = ''
-    if test in range(1, 6):
-        for i in hand_ints:
-            hand_ui_check += str(i) + ' '
-        with mock.patch.object(builtins, 'input', lambda _: hand_ui_check):
-            g_c.ui_check_answer()
-            out, err = capsys.readouterr()
-            if out != '''
-Seems no solutions\n\n''' and err != '''
-Seems no solutions\n\n''':
-                for ind in out:
-                    if ind == '×':
-                        result += '*'
-                    elif ind == '÷':
-                        result += '/'
-                    else:
-                        result += ind
-                for k in result[1:]:
-                    if k == '\n':
-                        break
-                    f_res += k
-                with mock.patch.object(builtins,
-                                       'input', lambda _: f_res):
-                    assert g_c.ui_menu_and_expr(menu,
-                                                choices,
-                                                eof=True) == calc.parse(f_res)
-            else:
-                with mock.patch.object(builtins, 'input', lambda _: 'n'):
-                    assert g_c.ui_menu_and_expr(menu, choices, eof=True) == 'n'
+    f_hand = ''
+    for i in hand_ints:
+        f_hand += str(i) + ' '
+    if test in '12345':
+        f_res = hl.hellp_ui_check_answer(capsys, f_hand)
+        if f_res != 'n':
+            f_check = calc.parse(f_res)
+        else:
+            f_check = f_res
+        with mock.patch.object(builtins, 'input', lambda _: f_res):
+            assert g_c.ui_menu_and_expr(menu, choices,
+                                        eof=True) == f_check
     else:
         with mock.patch.object(builtins, 'input', lambda _: test):
             assert g_c.ui_menu_and_expr(menu, choices, eof=True) == test
