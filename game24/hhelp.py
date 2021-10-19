@@ -3,6 +3,7 @@ import pytest
 import mock
 import builtins
 import sys
+import random
 import readline
 
 
@@ -112,3 +113,27 @@ def help_letters_and_numbers(a):
         if i not in '123456789':
             return i
     return a
+
+
+class MockGamePrintresult(gc, Hand):
+    """Creating an analogue of the 'GameConsole'
+    class with modified functions 'new_hand'"""
+    def new_hand(self):
+        if self.is_set_end():
+            return None
+
+        for ind in range(0, 13):
+            cards = []
+            for i in range(self.count):
+                idx = random.randint(0, len(self.cards) - 1)
+                cards.append(self.cards.pop(idx))
+            hand = Hand(cards, target=self.target)
+            self.hands.append(hand)
+        for i in range(0, 5):
+            self.hands[i].result = 's'
+        for i in range(5, 9):
+            self.hands[i].result = 'h'
+        for i in range(9, 13):
+            self.hands[i].result = 'f'
+        return hand
+        
