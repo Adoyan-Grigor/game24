@@ -245,30 +245,15 @@ def test_ui_menu_and_expr_negative_5(capsys, test):
         assert 'Invalid character: ' + check_symbol in out
 
 
-
-@pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
-def test_print_result(capsys, test):
+def test_print_result(capsys):
     """test of the 'print_result' function"""
-    print(test)
-    g_c = GC()
-    hand = g_c.new_hand()
-    solved = 0
-    failed = 0
-    hinted = 0
-    if hand.result == 's':
-        solved += 1
-    elif hand.result == 'h':
-        hinted += 1
-    elif hand.result == 'f':
-        failed += 1
+    g_c = hl.MockGamePrintresult()
+    g_c.new_hand()
     g_c.print_result()
     out, err = capsys.readouterr()
-    assert out, err == '''
-Total %d hands solved''' % solved + '''
-Total %d hands solved
-with hint''' % hinted + '''
-Total %d hands failed to solve''' % failed + '''\n\n'''
-
+    assert """Total 5 hands solved
+Total 4 hands solved with hint
+Total 4 hands failed to solve""" in out
 
 def test_play_1(capsys):
     """test of the 'play' function"""
