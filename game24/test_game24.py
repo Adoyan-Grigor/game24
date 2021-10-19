@@ -52,29 +52,8 @@ def test_raw_input_ex(input_output):
         assert GC().raw_input_ex() == input_output
 
 
-class GGameConsole(GC):
-    """Creating an analogue of the 'GameConsole' class
-    with modified functions 'raw_input' and 'ui_menu'"""
-    def __init__(self, target=24, count=4, face2ten=False, showcard=False):
-        super(GC, self).__init__(target, count, face2ten)
-        self.showcard = showcard
-
-    def raw_input_ex(self, prompt='', default=''):
-        '''enhance raw_input to support default input and also flat EOF'''
-        try:
-            readline.set_startup_hook(lambda: readline.insert_text(default))
-            try:
-                return input(prompt)
-            finally:
-                readline.set_startup_hook()
-
-        except EOFError:
-            input_eof = '\x00'
-            return input_eof
-
-
-gc.GameConsole.raw_input_ex = GGameConsole.raw_input_ex
-GC = GGameConsole
+gc.GameConsole.raw_input_ex = hl.GGameConsole.raw_input_ex
+GC = hl.GGameConsole
 
 
 @pytest.mark.parametrize('test', [('1'), ('2'), ('3'),
@@ -137,90 +116,134 @@ def test_ui_check_answer_negative(capsys, test):
         assert 'Invalid input' in out, err
 
 
-@pytest.mark.parametrize('test', [('1'), ('2'), ('3'), ('4'), ('5'),
-                                  ('h'), ('s'), ('b'),
-                                  ('q'), ('n')])
-def test_ui_menu_and_expr(capsys, test):
-    """test of the 'ui_menu_and_expr' function"""
+@pytest.mark.parametrize('test', [('12 + 12 + 12 - 12'), ('(12 + 12) / 12 * 12'),
+                                  ('12 * 12 / 12 + 12')])
+def test_ui_menu_and_expr_1(capsys, test):
+    """checking the function 'ui_emnu_and_expr' when we give an equation that consists of the allowed numbers"""
     menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
 3. I gave up, show me the answer (s)
 4. Back to the main menu (b)
 5. Quit the game (q)'''
-    def mock_calc(numb):
-        result = ''
-        for i in numb:
-            if i == '*':
-                result += '× '
-            elif i == '/':
-                result += '÷ '
-            elif i == '(' or i == ')':
-                result += i
-            else:
-                result += str(i) + ' '
-        return result
-    calc.parse = mock_calc
     choices = '1n2h3s4b5q'
-    g_c = GC()
+    g_c = hl.MockGame_5()
     hand = g_c.new_hand()
     hand_ints = hand.integers
-    f_hand = ''
-    for i in hand_ints:
-        f_hand += str(i) + ' '
-    if test in '12345':
-        f_res = hl.hellp_ui_check_answer(capsys, f_hand)
-        if f_res != 'n':
-            f_check = calc.parse(f_res)
-        else:
-            f_check = f_res
-        with mock.patch.object(builtins, 'input', lambda _: f_res):
-            assert g_c.ui_menu_and_expr(menu, choices,
-                                        eof=True) == f_check
-    else:
-        with mock.patch.object(builtins, 'input', lambda _: test):
-            assert g_c.ui_menu_and_expr(menu, choices, eof=True) == test
+    with mock.patch.object(builtins, 'input', lambda _: test):
+        assert g_c.ui_menu_and_expr(menu, choices, eof=True) == calc.parse(test)
+
+
+@pytest.mark.parametrize('test', [('1'), ('n'), ('2'), ('h'), ('3'), ('s'),
+                                  ('4'), ('b'), ('5'), ('q')])
+def test_ui_menu_and_expt_2(test):
+    """checking the ui_emnu_and_expr function when we give characters from 'choices'"""
+    menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
+3. I gave up, show me the answer (s)
+4. Back to the main menu (b)
+5. Quit the game (q)'''
+    choices = '1n2h3s4b5q'
+    g_c = hl.MockGame_5()
+    hand = g_c.new_hand()
+    hand_ints = hand.integers
+    with mock.patch.object(builtins, 'input', lambda _: test):
+        assert g_c.ui_menu_and_expr(menu, choices, eof=True) == test
+
+
+@pytest.mark.parametrize('test', [('12 - 12 + 12 + 12 - 12 + 12'),
+                                  ('12 + 12 * 12 / 12 + 12 - 12'),
+                                  ('12 + 12 + 12 + 12 - 12 - 12')])
+def test_ui_menu_and_expr_negative_1(capsys, test):
+    """checking the ui_emnu_and_expr function when we give the correct equation but using more numbers than allowed"""
+    g_c = hl.MockGame_5()
+    menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
+3. I gave up, show me the answer (s)
+4. Back to the main menu (b)
+5. Quit the game (q)'''
+    choices = '1n2h3s4b5q'
+    hand = g_c.new_hand()
+    hand_ints = hand.integers
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        assert g_c.ui_menu_and_expr(menu, choices) == calc.parse(test)
+
+
+@pytest.mark.parametrize('test', [('a'), ('A'), ('aA'), ('ggs'), ('AFAW'), ('ASffdS'),
+                                  ('8s'), ('8S'), ('4dsf'), ('3FSE'), ('4GdsAd')])
+def test_ui_menu_and_expr_negative_2(capsys, test):
+    """checking the ui_emnu_and_expr function when we give unresolved characters"""
+    g_c = hl.MockGame_5()
+    menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
+3. I gave up, show me the answer (s)
+4. Back to the main menu (b)
+5. Quit the game (q)'''
+    choices = '1n2h3s4b5q'
+    hand = g_c.new_hand()
+    hand_ints = hand.integers
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_menu_and_expr(menu, choices)
+        out, err = capsys.readouterr()
+        check_symbol = hl.help_letters_and_numbers(test)
+        assert 'Invalid character: ' + check_symbol in out
+
+
+@pytest.mark.parametrize('test', [('6'), ('7'), ('67'), ('12'), ('12345')])
+def test_ui_menu_and_expr_negative_3(capsys, test):
+    """checking the ui_emnu_and_expr function when we give numbers not from 'choices'"""
+    g_c = hl.MockGame_5()
+    menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
+3. I gave up, show me the answer (s)
+4. Back to the main menu (b)
+5. Quit the game (q)'''
+    choices = '1n2h3s4b5q'
+    hand = g_c.new_hand()
+    hand_ints = hand.integers
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_menu_and_expr(menu, choices)
+        out, err = capsys.readouterr()
+        assert 'Invalid expression: operator missed' in out
 
 
 @pytest.mark.xfail
-@pytest.mark.parametrize('test, err_type', [('1 + 1 + 1 + 1', 1),
-                                            ('1 + 1 + 1 + 1 + 1', 2),
-                                            ('1111', 3), ('R', 4),
-                                            ('rfwg', 4),
-                                            ('12 + 12 + 12 + 12', 2),
-                                            ('1 1 1 1', 5)])
-def test_ui_menu_and_expr_negative(capsys, test, err_type):
-    """negative test of the 'ui_menu_and_expr' function"""
-    class MockGame(GC, Hand):
-        """Creating an analogue of the 'GameConsole'
-        class with modified functions 'new_hand'"""
-        def new_hand(self):
-            """"modified function 'new_hand'"""
-            if self.is_set_end():
-                return None
-
-            cards = []
-            for i in range(self.count):
-                print(i)
-                idx = 0
-                cards.append(self.cards.pop(idx))
-            hand = Hand(cards, target=self.target)
-            self.hands.append(hand)
-            return hand
-
-    g_c = MockGame()
-    answers = (i for i in (test, 'b', 'q'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+def test_ui_menu_and_expr_negative_4(capsys):
+    """if you give 'ui_menu_and_expr' an empty string"""
+    g_c = hl.MockGame_5()
+    menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
+3. I gave up, show me the answer (s)
+4. Back to the main menu (b)
+5. Quit the game (q)'''
+    choices = '1n2h3s4b5q'
+    hand = g_c.new_hand()
+    hand_ints = hand.integers
+    answers = (i for i in ('', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _:next(answers)):
+        g_c.ui_menu_and_expr(menu, choices)
         out, err = capsys.readouterr()
-        if err_type == 1:
-            assert "Sorry! It's not correct!" in out, err
-        elif err_type == 2:
-            assert 'Invalid integer: ' in out
-        elif err_type == 3:
-            assert 'Invalid expression: operator missed' in out
-        elif err_type == 4:
-            assert 'Invalid character: ' + test[0] in out
-        elif err_type == 5:
-            assert 'Invalid token' in out
+        assert """Invalid expression: operator missed
+""" in out or 'Invalid character:' in out
+
+
+@pytest.mark.xfail
+@pytest.mark.parametrize('test', [('1n'), ('n2'), ('2h'), ('h3'),
+                                  ('3s'), ('s4'), ('4b'), ('b5'),
+                                  ('5q'), ('1n2h3s4b5q')])
+def test_ui_menu_and_expr_negative_5(capsys, test):
+    """if you give ui_menu_and_expr invalid input but found in 'choices'"""
+    g_c = hl.MockGame_5()
+    menu = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
+3. I gave up, show me the answer (s)
+4. Back to the main menu (b)
+5. Quit the game (q)'''
+    choices = '1n2h3s4b5q'
+    hand = g_c.new_hand()
+    hand_ints = hand.integers
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_menu_and_expr(menu, choices)
+        out, err = capsys.readouterr()
+        check_symbol = hl.help_letters_and_numbers(test)
+        assert 'Invalid character: ' + check_symbol in out
+
 
 
 @pytest.mark.parametrize('test', [(1), (2), (3), (4), (5)])
