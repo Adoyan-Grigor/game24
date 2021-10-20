@@ -1,41 +1,42 @@
-#!usr/bin/python3
-import pytest
+"""hhelp"""
 import mock
 import builtins
-import sys
 import random
-import readline
 
 
 from game24.gameconsole import GameConsole as gc
 from game24.game import Hand
 from game24.game import Game as gm
-from . import calc
+from game24 import calc
 
 
 class GGameConsole(gc):
+    """analogue of the 'GameConsole' class with the modified
+       'raw_input_ex' function for normal test work"""
+    @staticmethod
     def raw_input_ex(prompt='', default=''):
         '''enhance raw_input to support default input and also flat EOF'''
         return input(prompt)
 
-gc = GGameConsole
+
+GC = GGameConsole
 
 
-
-def hellp_ui_check_answer(capsys, r):
-    gg = gc()
-    result = ''
+def help_ui_check_answer(capsys, r_input):
+    """a function to calculate an equation from a combination of four numbers to get 24"""
+    g_c = GC()
     final_result = ''
-    with mock.patch.object(builtins, 'input', lambda _: r):
-        gg.ui_check_answer()
+    with mock.patch.object(builtins, 'input', lambda _: r_input):
+        g_c.ui_check_answer()
         out, err = capsys.readouterr()
+        print(err)
         if out == '\nSeems no solutions\n\n':
             final_result = 'n'
         else:
             for i in out:
                 if i == '\n':
                     break
-                elif i == '×':
+                if i == '×':
                     final_result += '*'
                 elif i == '÷':
                     final_result += '/'
@@ -44,7 +45,18 @@ def hellp_ui_check_answer(capsys, r):
         return final_result
 
 
-def hellp_new_hand_cards(cards):
+def help_ui_check_answer_all(capsys, r_input):
+    """function to calculate all equations from the combination of four numbers to get 24"""
+    g_c = GC()
+    with mock.patch.object(builtins, 'input', lambda _: r_input):
+        g_c.ui_check_answer()
+        out, err = capsys.readouterr()
+        print(err)
+    return out
+
+
+def help_new_hand_cards(cards):
+    """the modified 'new_hand_cards' function returns 12"""
     llist = []
     for i in range(len(cards[44: 48])):
         llist.append(cards[i])
@@ -54,24 +66,34 @@ def hellp_new_hand_cards(cards):
             cards.append(i)
     return cards
 
-def hellp_res_print():
-    return '''Good Job!
-\n--------------------------------------------------
-1. Try other solutions (t)
-2. Next hand (n)\n3. Show me the answers (s)
-4. Quit the game (q)
---------------------------------------------------
-\n--------------------------------------------------
-1. Definitely no solutions (n)
-2. Give me a hint (h)
-3. I gave up, show me the answer (s)
-4. Back to the main menu (b)
-5. Quit the game (q)
---------------------------------------------------
-\nGood Job!'''
+
+class MockGameNone(GC, Hand):
+    """Creating an analogue of the 'GameConsole'
+    class with modified functions 'new_hand'"""
+    def new_hand(self):
+        """"modified function 'new_hand'"""
+        return None
 
 
-class MockGame_1(gc, Hand):
+class MockGame0(GC, Hand):
+    """Creating an analogue of the 'GameConsole'
+    class with modified functions 'new_hand'"""
+    def new_hand(self):
+        """"modified function 'new_hand'"""
+        if self.is_set_end():
+            return None
+
+        cards = []
+        for i in range(self.count):
+            print(i)
+            idx = 0
+            cards.append(self.cards.pop(idx))
+        hand = Hand(cards, target=self.target)
+        self.hands.append(hand)
+        return hand
+
+
+class MockGame1(GC, Hand):
     """Creating an analogue of the 'GameConsole'
     class with modified functions 'new_hand'"""
     def new_hand(self):
@@ -89,7 +111,7 @@ class MockGame_1(gc, Hand):
         return hand
 
 
-class MockGame_5(gc, Hand):
+class MockGame5(GC, Hand):
     """Creating an analogue of the 'GameConsole'
     class with modified functions 'new_hand'"""
     def new_hand(self):
@@ -107,24 +129,25 @@ class MockGame_5(gc, Hand):
         return hand
 
 
-def help_letters_and_numbers(a):
-    res = ''
-    for i in a:
+def help_letters_and_numbers(arg):
+    """a function to calculate a letter from a string"""
+    for i in arg:
         if i not in '123456789':
             return i
-    return a
+    return arg
 
 
-class MockGamePrintresult(gc, Hand):
+class MockGamePrintresult(GC, Hand):
     """Creating an analogue of the 'GameConsole'
     class with modified functions 'new_hand'"""
     def new_hand(self):
         if self.is_set_end():
             return None
 
-        for ind in range(0, 13):
+        for i in range(0, 13):
             cards = []
-            for i in range(self.count):
+            for ind in range(self.count):
+                print(ind)
                 idx = random.randint(0, len(self.cards) - 1)
                 cards.append(self.cards.pop(idx))
             hand = Hand(cards, target=self.target)
@@ -136,4 +159,3 @@ class MockGamePrintresult(gc, Hand):
         for i in range(9, 13):
             self.hands[i].result = 'f'
         return hand
-        
