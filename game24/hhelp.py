@@ -1,13 +1,13 @@
 """hhelp"""
-import mock
 import builtins
 import random
+import mock
+
+import pytest
 
 
 from game24.gameconsole import GameConsole as gc
 from game24.game import Hand
-from game24.game import Game as gm
-from game24 import calc
 
 
 class GGameConsole(gc):
@@ -19,7 +19,8 @@ class GGameConsole(gc):
         return input(prompt)
 
 
-GC = GGameConsole
+gc.raw_input_ex = GGameConsole.raw_input_ex
+GC = gc
 
 
 def help_ui_check_answer(capsys, r_input):
@@ -159,3 +160,223 @@ class MockGamePrintresult(GC, Hand):
         for i in range(9, 13):
             self.hands[i].result = 'f'
         return hand
+
+
+def test_help_play_1(capsys):
+    """checking the 'play' function when the program skips all tasks"""
+    g_c = GC()
+    answers = (i for i in ('s', 's', 's',
+                           's', 's', 's',
+                           's', 's', 's',
+                           's', 's', 's',
+                           's', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_2(capsys, test):
+    """checking the 'play' function when the program responds
+       correctly that there is no correct answer"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    answers = (i for i in (test, 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_3(capsys, test):
+    """checking the play function when the user turns to the program for
+       help in solving the equation when there is no solution"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    answers = (i for i in (test, 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_4(test):
+    """checking the 'play' function when the user
+       wants to go to the main menu"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        return g_c.play()
+
+
+def test_help_play_5(test):
+    """checking the 'play' function when the user wants to log out"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    with mock.patch.object(builtins, 'input', lambda _: test):
+        with pytest.raises(SystemExit):
+            assert g_c.play().type == SystemExit
+
+
+def test_help_play_6(test):
+    """checking the 'play' function, check if MSG_MENU_SET_END is working"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's',
+                           's', 's', 's', 's', test, 's', 's', 's', 's',
+                           's', 's', 's', 's', 's',
+                           's', 's', 's', 's', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            assert g_c.play().type == SystemExit
+
+
+def test_help_play_7(test):
+    """checking the "play" function, when the user wants to go
+       to the main menu via MSG_MENU_SET_END"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    answers = (i for i in ('s', 's', 's', 's', 's',
+                           's', 's', 's', 's', 's',
+                           's', 's', 's', test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+
+
+def test_help_play_8(test):
+    """checking the "play" function, when the user wants to
+       exit the program via MSG_MENU_SET_END"""
+    g_c = MockGame0()
+    g_c.new_hand()
+    answers = (i for i in ('s', 's', 's', 's', 's',
+                           's', 's', 's', 's', 's',
+                           's', 's', 's', test))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            assert g_c.play().type == SystemExit
+
+
+def test_help_play_9(capsys):
+    """checking the "play" function, when hand is empty"""
+    g_c = MockGameNone()
+    g_c.new_hand()
+    answers = (i for i in ('1', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_10(capsys):
+    """checking the "play" function, when the user has correctly
+       solved the same equation twice"""
+    g_c = MockGame0()
+    answers = (i for i in ('s', 's', 's', 's', 's',
+                           '6 + 6 + 6 + 6', 't',
+                           '6 + 6 + 6 + 6', 'n',
+                           's', 's', 's', 's', 's',
+                           's', 's', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_c.play()
+    out, err = capsys.readouterr()
+    print(err)
+    return out
+
+
+def test_help_play_11(capsys):
+    """checking the "play" function, when the user correctly solved
+       the same equation twice, but in different ways"""
+    g_c = MockGame0()
+    answers = (i for i in ('s', 's', 's', 's', 's',
+                           '6 + 6 + 6 + 6', 't',
+                           '6 * 6 - 6 - 6', 'n',
+                           's', 's', 's', 's', 's',
+                           's', 's', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_12(capsys):
+    """checking the "play" function, when the user skips the task
+       after receiving help from the program"""
+    g_c = MockGame0()
+    answers = (i for i in ('h', 's', 'h', 's', 'h', 's', 'h', 's', 'h',
+                           's', 'h', 's', 'h', 's', 'h', 's', 'h', 's',
+                           'h', 's', 'h', 's', 'h', 's',
+                           'h', 's', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_13(capsys):
+    """checking the "play" function, when the user asks for the rest
+       of the answer options after the correct answer"""
+    g_c = MockGame5()
+    answers = (i for i in ('12 + 12 + 12 - 12', 's', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+    out, err = capsys.readouterr()
+    print(err)
+    return out
+
+
+def test_help_play_14(capsys):
+    """checking the "play" function, when the user finds a bug
+       by entering more numbers than allowed"""
+    g_c = MockGame5()
+    answers = (i for i in ('12 + 12 + 12 + 12 - 12 - 12', 'n', 'b', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_15(test):
+    """checking the "play" function, when, after the correct answer,
+       the user wants to exit the program"""
+    g_c = MockGame5()
+    answers = (i for i in ('12 + 12 + 12 - 12', test))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            assert g_c.play().type == SystemExit
+
+
+def test_help_play_16(capsys, test):
+    """checking the 'play' function when the program
+       receives an incorrect response"""
+    g_c = MockGame5()
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_play_17(capsys, test):
+    """checking the function 'play' when the program gets the correct
+       equation, but more numbers are used than allowed"""
+    g_c = MockGame5()
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_c.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
