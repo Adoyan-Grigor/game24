@@ -22,13 +22,13 @@ class GGameConsole(gc):
 
 gc.raw_input_ex = GGameConsole.raw_input_ex
 GC = gc
+g_c = GC()
 testargs = ['']
 
 
 def help_ui_check_answer(capsys, r_input):
     """a function to calculate an equation from a combination
        of four numbers to get 24"""
-    g_c = GC()
     final_result = ''
     with mock.patch.object(builtins, 'input', lambda _: r_input):
         g_c.ui_check_answer()
@@ -52,7 +52,6 @@ def help_ui_check_answer(capsys, r_input):
 def help_ui_check_answer_all(capsys, r_input):
     """function to calculate all equations from the combination
        of four numbers to get 24"""
-    g_c = GC()
     with mock.patch.object(builtins, 'input', lambda _: r_input):
         g_c.ui_check_answer()
         out, err = capsys.readouterr()
@@ -168,7 +167,6 @@ class MockGamePrintresult(GC, Hand):
 
 def test_help_play_1(capsys):
     """checking the 'play' function when the program skips all tasks"""
-    g_c = GC()
     answers = (i for i in ('s', 's', 's',
                            's', 's', 's',
                            's', 's', 's',
@@ -185,11 +183,11 @@ def test_help_play_1(capsys):
 def test_help_play_2(capsys, test):
     """checking the 'play' function when the program responds
        correctly that there is no correct answer"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     answers = (i for i in (test, 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -198,11 +196,11 @@ def test_help_play_2(capsys, test):
 def test_help_play_3(capsys, test):
     """checking the play function when the user turns to the program for
        help in solving the equation when there is no solution"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     answers = (i for i in (test, 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -211,67 +209,67 @@ def test_help_play_3(capsys, test):
 def test_help_play_4(test):
     """checking the 'play' function when the user
        wants to go to the main menu"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        return g_c.play()
+        return g_g.play()
 
 
 def test_help_play_5(test):
     """checking the 'play' function when the user wants to log out"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     with mock.patch.object(builtins, 'input', lambda _: test):
         with pytest.raises(SystemExit):
-            assert g_c.play().type == SystemExit
+            assert g_g.play().type == SystemExit
 
 
 def test_help_play_6(test):
     """checking the 'play' function, check if MSG_MENU_SET_END is working"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     answers = (i for i in ('s', 's', 's', 's', 's', 's', 's', 's', 's',
                            's', 's', 's', 's', test, 's', 's', 's', 's',
                            's', 's', 's', 's', 's',
                            's', 's', 's', 's', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            assert g_c.play().type == SystemExit
+            assert g_g.play().type == SystemExit
 
 
 def test_help_play_7(test):
     """checking the "play" function, when the user wants to go
        to the main menu via MSG_MENU_SET_END"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     answers = (i for i in ('s', 's', 's', 's', 's',
                            's', 's', 's', 's', 's',
                            's', 's', 's', test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
 
 
 def test_help_play_8(test):
     """checking the "play" function, when the user wants to
        exit the program via MSG_MENU_SET_END"""
-    g_c = MockGame0()
-    g_c.new_hand()
+    g_g = MockGame0()
+    g_g.new_hand()
     answers = (i for i in ('s', 's', 's', 's', 's',
                            's', 's', 's', 's', 's',
                            's', 's', 's', test))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            assert g_c.play().type == SystemExit
+            assert g_g.play().type == SystemExit
 
 
 def test_help_play_9(capsys):
     """checking the "play" function, when hand is empty"""
-    g_c = MockGameNone()
-    g_c.new_hand()
+    g_g = MockGameNone()
+    g_g.new_hand()
     answers = (i for i in ('1', 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -280,7 +278,7 @@ def test_help_play_9(capsys):
 def test_help_play_10(capsys):
     """checking the "play" function, when the user has correctly
        solved the same equation twice"""
-    g_c = MockGame0()
+    g_g = MockGame0()
     answers = (i for i in ('s', 's', 's', 's', 's',
                            '6 + 6 + 6 + 6', 't',
                            '6 + 6 + 6 + 6', 'n',
@@ -288,7 +286,7 @@ def test_help_play_10(capsys):
                            's', 's', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            g_c.play()
+            g_g.play()
     out, err = capsys.readouterr()
     print(err)
     return out
@@ -297,7 +295,7 @@ def test_help_play_10(capsys):
 def test_help_play_11(capsys):
     """checking the "play" function, when the user correctly solved
        the same equation twice, but in different ways"""
-    g_c = MockGame0()
+    g_g = MockGame0()
     answers = (i for i in ('s', 's', 's', 's', 's',
                            '6 + 6 + 6 + 6', 't',
                            '6 * 6 - 6 - 6', 'n',
@@ -305,7 +303,7 @@ def test_help_play_11(capsys):
                            's', 's', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            g_c.play()
+            g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -314,13 +312,13 @@ def test_help_play_11(capsys):
 def test_help_play_12(capsys):
     """checking the "play" function, when the user skips the task
        after receiving help from the program"""
-    g_c = MockGame0()
+    g_g = MockGame0()
     answers = (i for i in ('h', 's', 'h', 's', 'h', 's', 'h', 's', 'h',
                            's', 'h', 's', 'h', 's', 'h', 's', 'h', 's',
                            'h', 's', 'h', 's', 'h', 's',
                            'h', 's', 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -329,10 +327,10 @@ def test_help_play_12(capsys):
 def test_help_play_13(capsys):
     """checking the "play" function, when the user asks for the rest
        of the answer options after the correct answer"""
-    g_c = MockGame5()
+    g_g = MockGame5()
     answers = (i for i in ('12 + 12 + 12 - 12', 's', 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
     out, err = capsys.readouterr()
     print(err)
     return out
@@ -341,10 +339,10 @@ def test_help_play_13(capsys):
 def test_help_play_14(capsys):
     """checking the "play" function, when the user finds a bug
        by entering more numbers than allowed"""
-    g_c = MockGame5()
+    g_g = MockGame5()
     answers = (i for i in ('12 + 12 + 12 + 12 - 12 - 12', 'n', 'b', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.play()
+        g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -353,21 +351,21 @@ def test_help_play_14(capsys):
 def test_help_play_15(test):
     """checking the "play" function, when, after the correct answer,
        the user wants to exit the program"""
-    g_c = MockGame5()
+    g_g = MockGame5()
     answers = (i for i in ('12 + 12 + 12 - 12', test))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            assert g_c.play().type == SystemExit
+            assert g_g.play().type == SystemExit
 
 
 def test_help_play_16(capsys, test):
     """checking the 'play' function when the program
        receives an incorrect response"""
-    g_c = MockGame5()
+    g_g = MockGame5()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            g_c.play()
+            g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -376,11 +374,11 @@ def test_help_play_16(capsys, test):
 def test_help_play_17(capsys, test):
     """checking the function 'play' when the program gets the correct
        equation, but more numbers are used than allowed"""
-    g_c = MockGame5()
+    g_g = MockGame5()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         with pytest.raises(SystemExit):
-            g_c.play()
+            g_g.play()
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -473,37 +471,37 @@ def test_help_main_6(capsys, test):
 def test_help_ui_menu_and_expr_1(test, menu, choices):
     """checking the function 'ui_emnu_and_expr' when we give an
        equation that consists of the allowed numbers"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     with mock.patch.object(builtins, 'input', lambda _: test):
-        return g_c.ui_menu_and_expr(menu, choices,
+        return g_g.ui_menu_and_expr(menu, choices,
                                     eof=True)
 
 
 def test_help_ui_menu_and_expr_2(test, menu, choices):
     """checking the ui_emnu_and_expr function when
        we give characters from 'choices'"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     with mock.patch.object(builtins, 'input', lambda _: test):
-        return g_c.ui_menu_and_expr(menu, choices, eof=True)
+        return g_g.ui_menu_and_expr(menu, choices, eof=True)
 
 
 def test_help_ui_menu_and_expr_negative_1(test, menu, choices):
     """checking the function 'ui_emnu_and_expr' when the program gets
        the correct equation, but more numbers are used than allowed"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        return g_c.ui_menu_and_expr(menu, choices)
+        return g_g.ui_menu_and_expr(menu, choices)
 
 
 def test_help_ui_menu_and_expr_negative_2(capsys, test, menu, choices):
     """checking the ui_emnu_and_expr function
        when we give unresolved characters"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
         g_c.ui_menu_and_expr(menu, choices)
@@ -515,11 +513,11 @@ def test_help_ui_menu_and_expr_negative_2(capsys, test, menu, choices):
 def test_help_ui_menu_and_expr_negative_3(capsys, test, menu, choices):
     """checking the ui_emnu_and_expr function when
        we give numbers not from 'choices'"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu_and_expr(menu, choices)
+        g_g.ui_menu_and_expr(menu, choices)
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -527,11 +525,11 @@ def test_help_ui_menu_and_expr_negative_3(capsys, test, menu, choices):
 
 def test_help_ui_menu_and_expr_negative_4(capsys, menu, choices):
     """if you give 'ui_menu_and_expr' an empty string"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     answers = (i for i in ('', 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu_and_expr(menu, choices)
+        g_g.ui_menu_and_expr(menu, choices)
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -539,11 +537,11 @@ def test_help_ui_menu_and_expr_negative_4(capsys, menu, choices):
 
 def test_help_ui_menu_and_expr_negative_5(capsys, test, menu, choices):
     """if you give ui_menu_and_expr invalid input but found in 'choices'"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu_and_expr(menu, choices)
+        g_g.ui_menu_and_expr(menu, choices)
         out, err = capsys.readouterr()
         print(err)
         return out
@@ -552,11 +550,59 @@ def test_help_ui_menu_and_expr_negative_5(capsys, test, menu, choices):
 def test_help_ui_menu_and_expr_negative_6(capsys, test, menu, choices):
     """checking the 'ui_menu_and_expr' function when the
        program receives large letters of allowed characters"""
-    g_c = MockGame5()
-    g_c.new_hand()
+    g_g = MockGame5()
+    g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu_and_expr(menu, choices)
+        g_g.ui_menu_and_expr(menu, choices)
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_ui_menu(test):
+    """checking the 'ui_menu' function when the program
+       receives characters from 'choises'"""
+    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
+    choices = '1p2c3q'
+    with mock.patch.object(builtins, 'input', lambda _: test):
+        return g_c.ui_menu(menu, choices, eof=True)
+
+
+def test_help_ui_menu_negative_1(test, capsys):
+    """checking the 'ui_menu' function when the program
+       receives unresolved characters"""
+    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
+    choices = '1p2c3q'
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_menu(menu, choices, eof=True)
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_ui_menu_negative_2(test, capsys):
+    """checking the 'ui_menu' function when the program gets
+       capital letters from the 'choices' letters"""
+    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
+    choices = '1p2c3q'
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_menu(menu, choices, eof=True)
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_ui_menu_negative_3(capsys):
+    """checking the 'ui_menu' function when the program
+       receives an empty string"""
+    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
+    choices = '1p2c3q'
+    answers = (i for i in ('', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_menu(menu, choices, eof=True)
         out, err = capsys.readouterr()
         print(err)
         return out

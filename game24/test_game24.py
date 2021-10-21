@@ -61,10 +61,7 @@ GC = hl.GGameConsole
 def test_ui_menu(test):
     """checking the 'ui_menu' function when the program
        receives characters from 'choises'"""
-    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
-    choices = '1p2c3q'
-    with mock.patch.object(builtins, 'input', lambda _: test):
-        assert g_c.ui_menu(menu, choices, eof=True) == test
+    assert hl.test_help_ui_menu(test) == test
 
 
 @pytest.mark.parametrize('test', [('w'), ('T'), ('#'),
@@ -72,14 +69,8 @@ def test_ui_menu(test):
 def test_ui_menu_negative_1(test, capsys):
     """checking the 'ui_menu' function when the program
        receives unresolved characters"""
-    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
-    choices = '1p2c3q'
-    answers = (i for i in (test, 'q'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu(menu, choices, eof=True)
-        out, err = capsys.readouterr()
-        print(err)
-        assert 'Invalid input!' in out
+    assert 'Invalid input!' in hl.test_help_ui_menu_negative_1(test,
+                                                               capsys)
 
 
 @pytest.mark.xfail
@@ -87,28 +78,15 @@ def test_ui_menu_negative_1(test, capsys):
 def test_ui_menu_negative_2(test, capsys):
     """checking the 'ui_menu' function when the program gets
        capital letters from the 'choices' letters"""
-    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
-    choices = '1p2c3q'
-    answers = (i for i in (test, 'q'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu(menu, choices, eof=True)
-        out, err = capsys.readouterr()
-        print(err)
-        assert 'Invalid input' in out
+    assert 'Invalid input' in hl.test_help_ui_menu_negative_2(test,
+                                                              capsys)
 
 
 @pytest.mark.xfail
 def test_ui_menu_negative_3(capsys):
     """checking the 'ui_menu' function when the program
        receives an empty string"""
-    menu = '1. Play (p)\n2. Check answer (c)\n3. Quit (q)'
-    choices = '1p2c3q'
-    answers = (i for i in ('', 'q'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu(menu, choices, eof=True)
-        out, err = capsys.readouterr()
-        print(err)
-        assert 'Invalid input!' in out
+    assert 'Invalid input!' in hl.test_help_ui_menu_negative_3(capsys)
 
 
 @pytest.mark.parametrize('test_input, result', [('12 12 12 12',
