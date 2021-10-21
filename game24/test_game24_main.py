@@ -4,7 +4,7 @@ import pytest
 
 
 from game24 import gameconsole as gc
-from game24.hhelp import TestMain as hl
+from game24 import hhelp as hl
 
 
 MSG_SELECT = gc.MSG_SELECT

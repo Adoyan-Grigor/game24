@@ -3,8 +3,7 @@ import pytest
 
 
 from game24 import calc
-from game24.hhelp import TestUiMenuAndExpr as hl
-from game24 import hhelp
+from game24 import hhelp as hl
 
 
 MENU = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
@@ -50,7 +49,7 @@ def test_ui_menu_and_expr_negative_1(test):
 def test_ui_menu_and_expr_negative_2(capsys, test):
     """checking the ui_emnu_and_expr function
        when we give unresolved characters"""
-    check_symbol = 'Invalid character: ' + hhelp.help_letters_and_numbers(test)
+    check_symbol = 'Invalid character: ' + hl.help_letters_and_numbers(test)
     assert check_symbol in hl.test_help_ui_menu_and_expr_negative_2(capsys,
                                                                     test,
                                                                     MENU,
@@ -82,7 +81,7 @@ def test_ui_menu_and_expr_negative_4(capsys):
                                   ('5q'), ('1n2h3s4b5q')])
 def test_ui_menu_and_expr_negative_5(capsys, test):
     """if you give ui_menu_and_expr invalid input but found in 'choices'"""
-    check_symbol = 'Invalid character: ' + hhelp.help_letters_and_numbers(test)
+    check_symbol = 'Invalid character: ' + hl.help_letters_and_numbers(test)
     assert check_symbol in hl.test_help_ui_menu_and_expr_negative_5(capsys,
                                                                     test,
                                                                     MENU,
