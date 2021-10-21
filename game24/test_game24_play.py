@@ -1,9 +1,10 @@
-"""test_game24"""
+"""test_game24_play"""
 import pytest
 
 
 from game24 import gameconsole as gc
-from game24 import hhelp as hl
+from game24.hhelp import TestPlay as hl
+from game24 import hhelp
 
 
 def test_play_1(capsys):
@@ -92,7 +93,7 @@ Total 13 hands failed to solve""" in hl.test_help_play_12(capsys)
 def test_play_13(capsys):
     """checking the "play" function, when the user asks for the rest
        of the answer options after the correct answer"""
-    check = hl.help_ui_check_answer_all(capsys, '12 12 12 12')
+    check = hhelp.help_ui_check_answer_all(capsys, '12 12 12 12')
     assert check in hl.test_help_play_13(capsys)
 
 

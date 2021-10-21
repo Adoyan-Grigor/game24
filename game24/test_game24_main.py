@@ -1,23 +1,15 @@
 #!usr/bin/python3
 '''test_game24_main'''
-import builtins
-import sys
-
-import mock
-
 import pytest
 
 
 from game24 import gameconsole as gc
-from game24 import hhelp as hl
+from game24.hhelp import TestMain as hl
 
 
 MSG_SELECT = gc.MSG_SELECT
 INPUT_EOF = gc.INPUT_EOF
 testargs = ['']
-
-
-gc.GameConsole.raw_input_ex = hl.GGameConsole.raw_input_ex
 
 
 def test_main_1(capsys):
