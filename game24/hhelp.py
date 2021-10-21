@@ -2,6 +2,7 @@
 import builtins
 import random
 import mock
+import sys
 
 import pytest
 
@@ -21,6 +22,7 @@ class GGameConsole(gc):
 
 gc.raw_input_ex = GGameConsole.raw_input_ex
 GC = gc
+testargs = ['']
 
 
 def help_ui_check_answer(capsys, r_input):
@@ -380,3 +382,89 @@ def test_help_play_17(capsys, test):
         out, err = capsys.readouterr()
         print(err)
         return out
+
+def test_help_main_1(capsys):
+    """checking the 'main' function when the user launches the game"""
+    answers = (i for i in ('1', 's', '12 + 12 + 12 - 12',
+                           't', '12 + 12 * 12 / 12', 'n',
+                           'n', 'h', 'n', 's', 'n', 'h',
+                           '6 + 6 + 6 + 6', 'n', 's', 's',
+                           's', '2 + 2 + 2 + 2', 's',
+                           '12 + 12 + 12 - 12', 'n', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame1().main()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_main_2(capsys):
+    """checking the 'main' function, when the user wants
+       to use the 'ui_check_answer' function"""
+    answers = (i for i in ('2', '12 12 12',
+                           '12 12 12 12', '2',
+                           '2 2 2 2', '2',
+                           '5 5 5 5', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            MockGame1().main()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_main_3(capsys):
+    """checking the 'main' function, when the user skips an
+       equation that has no solution and exits the program"""
+    answers = (i for i in ('1', 's', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame1().main()
+        out, err = capsys.readouterr()
+        print(err)
+    return out
+
+
+def test_help_main_4(capsys):
+    """checking the 'main' function, when the user gives the correct answer,
+       skips the task, gives the wrong answer and exits"""
+    answers = (i for i in ('1', 's', '12 + 12 + 12 - 12',
+                           '3', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame1().main()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+@pytest.mark.xfail
+def test_help_main_5(capsys):
+    """checking the 'main' function, when the user starts the
+       game, gives an empty string and exits"""
+    answers = (i for i in ('1', '', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            MockGame1().main()
+            out, err = capsys.readouterr()
+            print(err)
+            return out
+
+
+@pytest.mark.xfail
+@pytest.mark.parametrize('test', [('P'), ('C'), ('Q')])
+def test_help_main_6(capsys, test):
+    """checking the 'main' function when the user types
+       capital letters from allowed characters"""
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame1().main()
+            out, err = capsys.readouterr()
+            print(err)
+            return out
