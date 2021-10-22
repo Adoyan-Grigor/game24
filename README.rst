@@ -11,16 +11,19 @@ Usage
 * To run the test you need to use
 
 .. code-block:: bash
+
         $ pytest test_*
 
 * Run a test with additional information
 
 .. code-block:: bash
+
     $ pytest -v test_*
 
 * Check test coverage
 
 .. code-block:: bash
+
     $ pytest —cov=game24 test_*
 
 License
