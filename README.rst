@@ -1,37 +1,30 @@
 ======
-test_game24
+game24
 ======
 
-this project is testing the console game 'game24'
-link: 'https://github.com/benhengx/game24'
+this project is testing the console game 'game24' link: 'https://github.com/benhengx/game24'
 
 
 Usage
----—
+-----
 
 * To run the test you need to use
 
 .. code-block:: bash
-
-$ pytest test_*
+        $ pytest test_*
 
 * Run a test with additional information
 
 .. code-block:: bash
-
-$ pytest -v test_*
+    $ pytest -v test_*
 
 * Check test coverage
 
 .. code-block:: bash
-
-$ pytest —cov=game24 test_*
-
-TODO
----—
+    $ pytest —cov=game24 test_*
 
 License
------—
+-------
 
 Copyright 2015 benhengx
 
