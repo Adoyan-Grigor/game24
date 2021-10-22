@@ -1,5 +1,5 @@
 ======
-game24
+test_game24
 ======
 
 this project is testing the console game 'game24' link: 'https://github.com/benhengx/game24'
