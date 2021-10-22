@@ -1,51 +1,37 @@
 ======
-game24
+test_game24
 ======
 
-A console application to play the 24 Game (see the `Wikipedia article <https://en.wikipedia.org/wiki/24_Game>`_ for introduction)
+this project is testing the console game 'game24'
+link: 'https://github.com/benhengx/game24'
 
-Installation
-------------
-
-.. code-block:: bash
-
-    $ pip install game24
-
-Or
-
-.. code-block:: bash
-
-    $ python setup.py install
 
 Usage
------
+---—
 
-* Play the game
-
-.. code-block:: bash
-
-    $ 24gameconsole
-
-* Check solutions for a hand of cards
+* To run the test you need to use
 
 .. code-block:: bash
 
-    $ 24gameconsole <integer1> <integer2> <integer3> <integer4>
+$ pytest test_*
 
-* Check result for an expression (a simple calculator)
+* Run a test with additional information
 
 .. code-block:: bash
 
-    $ 24gameconsole 'expression'
+$ pytest -v test_*
+
+* Check test coverage
+
+.. code-block:: bash
+
+$ pytest —cov=game24 test_*
 
 TODO
------
-
-- Add test cases.
-
+---—
 
 License
--------
+-----—
 
 Copyright 2015 benhengx
 
