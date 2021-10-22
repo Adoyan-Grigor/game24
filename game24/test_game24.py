@@ -105,11 +105,7 @@ def test_ui_menu_negative_3(capsys):
 def test_ui_check_answer(capsys, test_input, result):
     """checking the ui_check_answer function when the program
       receives the usual input for the function"""
-    with mock.patch.object(builtins, 'input', lambda _: test_input):
-        GC().ui_check_answer()
-        out, err = capsys.readouterr()
-        print(err)
-        assert out, err == result
+    assert hl.test_help_ui_check_answer(capsys, test_input) in result
 
 
 @pytest.mark.parametrize('test', [('1 1 1'), ('adwada'),
@@ -117,24 +113,15 @@ def test_ui_check_answer(capsys, test_input, result):
 def test_ui_check_answer_negative(capsys, test):
     """checking function 'ui_check_answer' when
        program receives invalid input"""
-    answers = (i for i in (test, '1 1 1 1'))
-    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_check_answer()
-        out, err = capsys.readouterr()
-        print(err)
-        assert 'Invalid input' in out, err
+    assert 'Invalid input' in hl.test_help_ui_check_answer_negative(capsys,
+                                                                    test)
 
 
 def test_print_result(capsys):
     """test of the 'print_result' function"""
-    c_g = hl.MockGamePrintresult()
-    c_g.new_hand()
-    c_g.print_result()
-    out, err = capsys.readouterr()
-    print(err)
     assert """Total 5 hands solved
 Total 4 hands solved with hint
-Total 4 hands failed to solve""" in out
+Total 4 hands failed to solve""" in hl.test_help_print_result(capsys)
 
 
 @pytest.mark.parametrize('test', [('1'), ('p')])
@@ -198,7 +185,7 @@ def test_solve(test, test_targ, result):
 
 @pytest.mark.parametrize('test', [(1), (2), (3)])
 def test_arg_parse(test):
-    """negative test of the 'arg_parse' function"""
+    """test of the 'arg_parse' function"""
     print(test)
     testargs = ['']
     with mock.patch.object(sys, 'argv', testargs):

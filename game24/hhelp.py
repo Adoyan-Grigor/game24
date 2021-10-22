@@ -59,18 +59,6 @@ def help_ui_check_answer_all(capsys, r_input):
     return out
 
 
-def help_new_hand_cards(cards):
-    """the modified 'new_hand_cards' function returns 12"""
-    llist = []
-    for i in range(len(cards[44: 48])):
-        llist.append(cards[i])
-    cards = []
-    while len(cards) < 53:
-        for i in llist:
-            cards.append(i)
-    return cards
-
-
 class MockGameNone(GC, Hand):
     """Creating an analogue of the 'GameConsole'
     class with modified functions 'new_hand'"""
@@ -606,3 +594,34 @@ def test_help_ui_menu_negative_3(capsys):
         out, err = capsys.readouterr()
         print(err)
         return out
+
+
+def test_help_ui_check_answer(capsys, test_input):
+    """checking the ui_check_answer function when the program
+      receives the usual input for the function"""
+    with mock.patch.object(builtins, 'input', lambda _: test_input):
+        GC().ui_check_answer()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_ui_check_answer_negative(capsys, test):
+    """checking function 'ui_check_answer' when
+       program receives invalid input"""
+    answers = (i for i in (test, '1 1 1 1'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        g_c.ui_check_answer()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
+def test_help_print_result(capsys):
+    """test of the 'print_result' function"""
+    c_g = MockGamePrintresult()
+    c_g.new_hand()
+    c_g.print_result()
+    out, err = capsys.readouterr()
+    print(err)
+    return out
