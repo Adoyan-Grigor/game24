@@ -75,7 +75,7 @@ class GameConsole(game.Game):
         try:
             readline.set_startup_hook(lambda: readline.insert_text(default))
             try:
-                return raw_input(prompt)
+                return input(prompt)
             finally:
                 readline.set_startup_hook()
 
@@ -94,7 +94,10 @@ class GameConsole(game.Game):
         GameConsole.print_title(menu, dechar='-')
         while True:
             r = GameConsole.raw_input_ex(MSG_SELECT).strip()
-            if r.lower() in choices or (eof and r == INPUT_EOF):
+            if r == '' or (r in choices and len(r) > 1):
+                print(MSG_INVALID_INPUT)
+                continue
+            elif r in choices or (eof and r == INPUT_EOF):
                 print()
                 return r
             print(MSG_INVALID_INPUT)
@@ -157,7 +160,10 @@ class GameConsole(game.Game):
         self.print_title(menu, dechar='-')
         while True:
             r = self.raw_input_ex(MSG_PLAY_INPUT_EXPR).strip()
-            if r.lower() in choices or (eof and r == INPUT_EOF):
+            if r == '' or (r in choices and len(r) > 1):
+                print(MSG_INVALID_INPUT)
+                continue
+            elif r in choices or (eof and r == INPUT_EOF):
                 print()
                 return r
 
@@ -187,7 +193,7 @@ class GameConsole(game.Game):
                 self.print_result()
 
                 choices = '1n2b3q'
-                r = self.ui_menu(MSG_MENU_SET_END, choices)
+                r = self.ui_menu(MSG_MENU_SET_END, choices)                    
                 if r in '1n':
                     # renew the set
                     self.reset()
@@ -213,12 +219,13 @@ class GameConsole(game.Game):
                 r = self.ui_menu_and_expr(MSG_MENU_PLAY, choices)
                 if isinstance(r, calc.Expr):
                     expr = r
+                    check_r = str(r)
                     if expr.value == self.target:
                         hand.solved()
-                        if expr not in hand.answers:
-                            s = MSG_PLAY_FIND_BUG
-                        else:
-                            s = MSG_PLAY_RIGHT
+                        if not self.calculating_the_number_of_numbers(check_r, sc):
+                            print(MSG_INVALID_INPUT)
+                            continue
+                        s = MSG_PLAY_RIGHT
                         self.print_title(s)
 
                         choices = '1t2n3s4q'
@@ -273,6 +280,37 @@ class GameConsole(game.Game):
                 break
 
 
+    def substitution_of_characters(self, r):
+        """character correction function"""
+        final_result = ''
+        for i in r:
+            if i == '\n':
+                break
+            if i == '×':
+                final_result += '*'
+            elif i == '÷':
+                final_result += '/'
+            else:
+                final_result += i
+        return final_result
+
+
+
+    def calculating_the_number_of_numbers(self, r, sc):
+        """calculates how many numbers are in the user input"""
+        numb = ''
+        check_list = []
+        choices = '1234567890'
+        r = self.substitution_of_characters(r).split()
+        sc = sc.split()
+        for i in r:
+            if i in '+-*/':
+                r.remove(i)
+        if len(r) != len(sc):
+            return False
+        return True
+
+
 def arg_parse():
     parser = argparse.ArgumentParser(description='Play the 24 Game')
     parser.add_argument('-c', type=int, default=4, dest='count',
@@ -293,23 +331,6 @@ def arg_parse():
 
     if not r.interactive and len(r.integers) == 0:
         r.interactive = True
-
-    elif not r.interactive and len(r.integers) != 1:
-        if len(r.integers) != r.count:
-            parser.error('invalid number of integers provided, expect %d' % 
-                                                                    r.count)
-
-        err_nums = [s for s in r.integers if not s.isdigit()]
-        if err_nums:
-            parser.error('invalid integers: %s' % str(err_nums))
-
-        r.integers = [int(s) for s in r.integers]
-
-        err_nums = [i for i in r.integers if i < 1 or 
-                        i > (r.face2ten and 10 or 13)]
-        if err_nums:
-            parser.error('invalid integers: %s' % str(err_nums))
-
     return r
 
 
@@ -320,24 +341,6 @@ def main():
             gc = GameConsole(args.target, args.count, 
                         args.face2ten, args.showcard)
             gc.main()
-
-        elif len(args.integers) == 1:
-            # parse expression
-            expr = calc.parse(args.integers[0])
-            if args.debug:
-                print(repr(expr))
-                print(str(expr))
-            print(expr.value)
-
-        else:
-            # solve
-            exprs = calc.solve(args.integers, args.target)
-            if not exprs:
-                print(MSG_PLAY_NO_ANSWER)
-            else:
-                for expr in exprs:
-                    print(args.debug and repr(expr) or str(expr))
-
         sys.exit(0)
 
     except KeyboardInterrupt:
