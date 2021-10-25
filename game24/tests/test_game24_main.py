@@ -1,14 +1,11 @@
-#!usr/bin/python3
 '''test_game24_main'''
 import pytest
 
 
 from game24 import gameconsole as gc
-from game24 import hhelp as hl
+from game24.help import hhelp as hl
 
 
-MSG_SELECT = gc.MSG_SELECT
-INPUT_EOF = gc.INPUT_EOF
 testargs = ['']
 
 
@@ -24,7 +21,7 @@ def test_main_2(capsys):
        to use the 'ui_check_answer' function"""
     check_list = ['Invalid input!', """12 + 12 + 12 - 12
 12 × (12 + 12) ÷ 12
-12 + 12 × 12 ÷ 12""", """Seems no solutions""", """
+12 + 12 × 12 ÷ 12""", "Seems no solutions", """
 5 × 5 - 5 ÷ 5"""]
     for check in check_list:
         assert check in hl.test_help_main_2(capsys)
@@ -44,16 +41,37 @@ def test_main_4(capsys):
 12 + 12 × 12 ÷ 12""" in hl.test_help_main_4(capsys)
 
 
-@pytest.mark.xfail
 def test_main_5(capsys):
+    """checking the 'main' function when the user starts the game and correctly
+       solves the equation but using more numbers than allowed"""
+    assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_main_5(capsys)
+
+
+def test_main_6(capsys):
     """checking the 'main' function, when the user starts the
-       game, gives an empty string and exits"""
-    assert 'Invalid input!' in hl.test_help_main_5(capsys)
+       game, gives an empty stchecking the 'main' function when the user types
+       capital letters from allowed charactersring and exits"""
+    assert gc.MSG_INVALID_INPUT in hl.test_help_main_6(capsys)
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('test', [('P'), ('C'), ('Q')])
-def test_main_6(capsys, test):
+def test_main_7(capsys, test):
     """checking the 'main' function when the user types
        capital letters from allowed characters"""
-    assert 'Invalid input!' in hl.test_help_main_6(capsys, test)
+    assert gc.MSG_INVALID_INPUT in hl.test_help_main_7(capsys, test)
+
+
+def test_main_8(capsys):
+    """checking the 'main' function when the user starts
+       the game, enters a blank line and exits"""
+    assert gc.MSG_INVALID_INPUT in hl.test_help_main_8(capsys)
+
+
+@pytest.mark.parametrize('test', [('12 + 12 + 12 + 12'),
+                                  ('12 - 12 - 12 + 12'),
+                                  ('12 * 12 - 12 * 12')])
+def test_main_9(capsys, test):
+    """checking the 'main' function when the user starts the
+       game first gives an incorrect answer, then he gives a
+       correct answer and exits"""
+    assert gc.MSG_PLAY_WRONG in hl.test_help_main_9(capsys, test)

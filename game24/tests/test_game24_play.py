@@ -3,7 +3,7 @@ import pytest
 
 
 from game24 import gameconsole as gc
-from game24 import hhelp as hl
+from game24.help import hhelp as hl
 
 
 def test_play_1(capsys):
@@ -96,32 +96,39 @@ def test_play_13(capsys):
     assert check in hl.test_help_play_13(capsys)
 
 
-def test_play_14(capsys):
-    """checking the "play" function, when the user finds a bug
-       by entering more numbers than allowed"""
-    assert gc.MSG_PLAY_FIND_BUG in hl.test_help_play_14(capsys)
-
-
 @pytest.mark.parametrize('test', [('4'), ('q')])
-def test_play_15(test):
+def test_play_14(test):
     """checking the 'play' function when the program
        receives an incorrect response"""
-    hl.test_help_play_15(test)
+    hl.test_help_play_14(test)
 
 
 @pytest.mark.parametrize('test', [('12 + 12 + 12 + 12'), ('12 - 12 * 12 / 12'),
                                   ('12 - 12 - 12 + 12')])
-def test_play_16(capsys, test):
+def test_play_15(capsys, test):
     """checking the 'play' function when the program
        receives an incorrect response"""
-    assert "Sorry! It's not correct!" in hl.test_help_play_16(capsys, test)
+    assert gc.MSG_PLAY_WRONG in hl.test_help_play_15(capsys, test)
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('test', [('12 - 12 + 12 + 12 - 12 + 12'),
                                   ('12 + 12 * 12 / 12 + 12 - 12'),
                                   ('12 + 12 + 12 + 12 - 12 - 12')])
-def test_play_17(capsys, test):
+def test_play_16(capsys, test):
     """checking the function 'play' when the program gets the correct
        equation, but more numbers are used than allowed"""
-    assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_play_17(capsys, test)
+    assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_play_16(capsys, test)
+
+
+def test_play_17(capsys):
+    """checking the 'play' function when the user enters an empty string"""
+    assert gc.MSG_INVALID_INPUT in hl.test_help_play_17(capsys)
+
+
+@pytest.mark.parametrize('test', [('12 + 12 + 12 + 12'), ('12 - 12 * 12 / 12'),
+                                  ('12 - 12 - 12 + 12')])
+def test_play_18(capsys, test):
+    """checking the 'play' function when the user enters a
+       wrong answer twice and exits"""
+    assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_play_18(capsys,
+                                                              test)

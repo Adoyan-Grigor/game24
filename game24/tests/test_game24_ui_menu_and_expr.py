@@ -2,8 +2,9 @@
 import pytest
 
 
+from game24 import gameconsole as gc
 from game24 import calc
-from game24 import hhelp as hl
+from game24.help import hhelp as hl
 
 
 MENU = '''1. Definitely no solutions (n)\n2. Give me a hint (h)
@@ -67,28 +68,24 @@ def test_ui_menu_and_expr_negative_3(capsys, test):
     assert 'Invalid expression: operator missed' in check
 
 
-@pytest.mark.xfail
 def test_ui_menu_and_expr_negative_4(capsys):
     """if you give 'ui_menu_and_expr' an empty string"""
     check = hl.test_help_ui_menu_and_expr_negative_4(capsys, MENU, CHOICES)
-    assert """Invalid expression: operator missed
-""" in check or 'Invalid character:' in check
+    assert gc.MSG_INVALID_INPUT in check
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('test', [('1n'), ('n2'), ('2h'), ('h3'),
                                   ('3s'), ('s4'), ('4b'), ('b5'),
                                   ('5q'), ('1n2h3s4b5q')])
 def test_ui_menu_and_expr_negative_5(capsys, test):
     """if you give ui_menu_and_expr invalid input but found in 'choices'"""
-    check_symbol = 'Invalid character: ' + hl.help_letters_and_numbers(test)
-    assert check_symbol in hl.test_help_ui_menu_and_expr_negative_5(capsys,
-                                                                    test,
-                                                                    MENU,
-                                                                    CHOICES)
+    check = hl.test_help_ui_menu_and_expr_negative_5(capsys,
+                                                     test,
+                                                     MENU,
+                                                     CHOICES)
+    assert gc.MSG_INVALID_INPUT in check
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('test', [('N'), ('H'), ('S'), ('B'), ('Q')])
 def test_ui_menu_and_expr_negative_6(capsys, test):
     """checking the 'ui_menu_and_expr' function when the

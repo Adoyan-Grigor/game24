@@ -9,7 +9,7 @@ import pytest
 
 from game24 import calc
 from game24 import gameconsole as gc
-from game24 import hhelp as hl
+from game24.help import hhelp as hl
 
 GC = gc.GameConsole
 g_c = GC()
@@ -49,11 +49,7 @@ def test_print_title_negativie(capsys, title, result):
 def test_raw_input_ex(input_output):
     """test of the 'raw_input_ex' function"""
     with mock.patch.object(builtins, 'input', lambda _: input_output):
-        assert GC().raw_input_ex() == input_output
-
-
-gc.GameConsole.raw_input_ex = hl.GGameConsole.raw_input_ex
-GC = hl.GGameConsole
+        assert GC.raw_input_ex() == input_output
 
 
 @pytest.mark.parametrize('test', [('1'), ('2'), ('3'),
@@ -73,7 +69,6 @@ def test_ui_menu_negative_1(test, capsys):
                                                                capsys)
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('test', [('P'), ('C'), ('Q')])
 def test_ui_menu_negative_2(test, capsys):
     """checking the 'ui_menu' function when the program gets
@@ -82,7 +77,6 @@ def test_ui_menu_negative_2(test, capsys):
                                                               capsys)
 
 
-@pytest.mark.xfail
 def test_ui_menu_negative_3(capsys):
     """checking the 'ui_menu' function when the program
        receives an empty string"""
