@@ -77,7 +77,7 @@ def test_main_9(capsys, test):
     assert gc.MSG_PLAY_WRONG in hl.test_help_main_9(capsys, test)
 
 
-def test_help_main_10(capsys):
+def test__main_10(capsys):
     """checking the 'main' function, when the user starts
        the game, gives the wrong answer several times and exits"""
     assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_main_10(capsys)
