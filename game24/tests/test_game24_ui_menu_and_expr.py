@@ -4,7 +4,7 @@ import pytest
 
 from game24 import gameconsole as gc
 from game24 import calc
-from game24.help import hhelp as hl
+from game24.tests import hhelp as hl
 
 
 MENU = '''1. Definitely no solutions (n)\n2. Give me a hint (h)

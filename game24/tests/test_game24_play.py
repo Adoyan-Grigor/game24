@@ -3,7 +3,7 @@ import pytest
 
 
 from game24 import gameconsole as gc
-from game24.help import hhelp as hl
+from game24.tests import hhelp as hl
 
 
 def test_play_1(capsys):

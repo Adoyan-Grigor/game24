@@ -9,7 +9,7 @@ import pytest
 
 from game24 import calc
 from game24 import gameconsole as gc
-from game24.help import hhelp as hl
+from game24.tests import hhelp as hl
 
 GC = gc.GameConsole
 g_c = GC()
