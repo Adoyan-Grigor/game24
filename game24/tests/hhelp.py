@@ -7,10 +7,10 @@ import mock
 import pytest
 
 
-from game24.gameconsole import GameConsole as gc
+from game24 import gameconsole as gc
 from game24.game import Hand
 
-GC = gc
+GC = gc.GameConsole
 g_c = GC()
 testargs = ['']
 
