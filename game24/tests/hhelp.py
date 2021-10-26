@@ -414,9 +414,9 @@ def test_help_main_3(capsys):
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             with pytest.raises(SystemExit):
                 MockGame1().main()
-        out, err = capsys.readouterr()
-        print(err)
-    return out
+            out, err = capsys.readouterr()
+            print(err)
+            return out
 
 
 def test_help_main_4(capsys):
@@ -490,6 +490,21 @@ def test_help_main_9(capsys, test):
        correct answer and exits"""
     answers = (i for i in ('1', test, '12 + 12 + 12 - 12',
                            'n', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame5().main()
+            out, err = capsys.readouterr()
+            print(err)
+            return out
+
+
+def test_help_main_10(capsys):
+    """checking the 'main' function, when the user starts
+       the game, gives the wrong answer several times and exits"""
+    answers = (i for i in ('1', '12 + 12 + 12 + 12',
+                           '12 * 12 * 12 * 12', '12 + 12 - 12 - 12',
+                           '12 / 12 * 12 * 12', '12 - 12 * 12 - 12', 'q'))
     with mock.patch.object(sys, 'argv', testargs):
         with mock.patch.object(builtins, 'input', lambda _: next(answers)):
             with pytest.raises(SystemExit):
