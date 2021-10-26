@@ -229,6 +229,7 @@ class GameConsole(game.Game):
                         self.print_title(s)
 
                         choices = '1t2n3s4q'
+
                         r = self.ui_menu(MSG_MENU_PLAY_RIGHT, choices, eof=False)
                         if r in '1t':
                             continue
@@ -280,31 +281,15 @@ class GameConsole(game.Game):
                 break
 
 
-    def substitution_of_characters(self, r):
-        """character correction function"""
-        final_result = ''
-        for i in r:
-            if i == '\n':
-                break
-            if i == '×':
-                final_result += '*'
-            elif i == '÷':
-                final_result += '/'
-            else:
-                final_result += i
-        return final_result
-
-
-
     def calculating_the_number_of_numbers(self, r, sc):
         """calculates how many numbers are in the user input"""
         numb = ''
         check_list = []
         choices = '1234567890'
-        r = self.substitution_of_characters(r).split()
+        r = r.split()
         sc = sc.split()
         for i in r:
-            if i in '+-*/':
+            if i in '+-*×/÷':
                 r.remove(i)
         if len(r) != len(sc):
             return False
