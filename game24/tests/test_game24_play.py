@@ -132,3 +132,15 @@ def test_play_18(capsys, test):
        wrong answer twice and exits"""
     assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_play_18(capsys,
                                                               test)
+
+
+@pytest.mark.xfail
+def test_play_19(capsys):
+    """checking the "main" function when the user skips a problem,
+    solves the equation correctly, cannot solve the same equation
+    again, asks for help, solves the equation correctly, skips the
+    remaining problems, and quits the game"""
+    check = """Total 1 hands solved
+Total 0 hands solved with hint
+Total 11 hands failed to solve"""
+    assert check in hl.test_help_play_19(capsys)

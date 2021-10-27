@@ -85,7 +85,8 @@ def test_main_10(capsys):
 
 @pytest.mark.parametrize('test', [('a'), ('A'), ('Aa'), ('aA'), (','),
                                   ('./,'), ('agsg'), ('SGRH'), ('sAfsW'),
-                                  ('AfsfAsf'), ('1s2sf24'), ('124fs'), ('asd1')])
+                                  ('AfsfAsf'), ('1s2sf24'),
+                                  ('124fs'), ('asd1')])
 def test_main_11(capsys, test):
     """checking the 'main' function when the user gives unauthorized input"""
     check = 'Invalid character: ' + hl.help_letters_and_numbers(test)
@@ -108,3 +109,15 @@ def test_main_13(capsys, test):
        gives an unauthorized input in the main menu"""
     check = 'Invalid input!'
     assert check in hl.test_help_main_13(capsys, test)
+
+
+@pytest.mark.xfail
+def test_main_14(capsys):
+    """checking the 'main' function, when the user starts the game,
+    skips the task, solves the equation correctly, fails to solve
+    the same equation again, asks for help, solves the equation
+    correctly, skips the remaining tasks and exits the game"""
+    check = """Total 1 hands solved
+Total 0 hands solved with hint
+Total 11 hands failed to solve"""
+    assert check in hl.test_help_main_14(capsys), hl.test_help_main_14(capsys)

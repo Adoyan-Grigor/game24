@@ -374,6 +374,25 @@ def test_help_play_18(capsys, test):
         return out
 
 
+def test_help_play_19(capsys):
+    """checking the "main" function when the user skips a problem,
+    solves the equation correctly, cannot solve the same equation
+    again, asks for help, solves the equation correctly, skips the
+    remaining problems, and quits the game"""
+    g_g = MockGame1()
+    answers = (i for i in ('s', '12 + 12 + 12 - 12',
+                           't', '12 + 12 + 12 + 12',
+                           'h', '12 + 12 * 12 / 12',
+                           's', 's', 's', 's', 's', 's',
+                           's', 's', 's', 's', 's', 's', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_g.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
 def test_help_main_1(capsys):
     """checking the 'main' function when the user launches the game"""
     answers = (i for i in ('1', 's', '12 + 12 + 12 - 12',
@@ -536,6 +555,25 @@ def test_help_main_13(capsys, test):
         out, err = capsys.readouterr()
         print(err)
         return out
+
+
+def test_help_main_14(capsys):
+    """checking the 'main' function, when the user starts the game,
+    skips the task, solves the equation correctly, fails to solve
+    the same equation again, asks for help, solves the equation
+    correctly, skips the remaining tasks and exits the game"""
+    answers = (i for i in ('1', 's', '12 + 12 + 12 - 12',
+                           't', '12 + 12 + 12 + 12',
+                           'h', '12 + 12 * 12 / 12',
+                           's', 's', 's', 's', 's', 's',
+                           's', 's', 's', 's', 's', 's', 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame1().main()
+            out, err = capsys.readouterr()
+            print(err)
+            return out
 
 
 def test_help_ui_menu_and_expr_1(test, menu, choices):
