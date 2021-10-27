@@ -85,7 +85,7 @@ def test_main_10(capsys):
 
 @pytest.mark.parametrize('test', [('a'), ('A'), ('Aa'), ('aA'), (','),
                                   ('./,'), ('agsg'), ('SGRH'), ('sAfsW'),
-                                  ('AfsfAsf')])
+                                  ('AfsfAsf'), ('1s2sf24'), ('124fs'), ('asd1')])
 def test_main_11(capsys, test):
     """checking the 'main' function when the user gives unauthorized input"""
     check = 'Invalid character: ' + hl.help_letters_and_numbers(test)
