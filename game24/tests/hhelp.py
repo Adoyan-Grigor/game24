@@ -514,6 +514,30 @@ def test_help_main_10(capsys):
             return out
 
 
+def test_help_main_11_12(capsys, test):
+    """checking the 'main' function when the user gives unauthorized input"""
+    answers = (i for i in ('1', test, 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            with pytest.raises(SystemExit):
+                MockGame5().main()
+            out, err = capsys.readouterr()
+            print(err)
+            return out
+
+
+def test_help_main_13(capsys, test):
+    """checking the "main" function when the user gives
+       an unauthorized input in the main menu"""
+    answers = (i for i in (test, 'q'))
+    with mock.patch.object(sys, 'argv', testargs):
+        with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+            MockGame5().main()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
 def test_help_ui_menu_and_expr_1(test, menu, choices):
     """checking the function 'ui_emnu_and_expr' when we give an
        equation that consists of the allowed numbers"""

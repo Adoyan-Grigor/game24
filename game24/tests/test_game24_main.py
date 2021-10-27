@@ -81,3 +81,30 @@ def test_main_10(capsys):
     """checking the 'main' function, when the user starts
        the game, gives the wrong answer several times and exits"""
     assert gc.MSG_MENU_PLAY_RIGHT not in hl.test_help_main_10(capsys)
+
+
+@pytest.mark.parametrize('test', [('a'), ('A'), ('Aa'), ('aA'), (','),
+                                  ('./,'), ('agsg'), ('SGRH'), ('sAfsW'),
+                                  ('AfsfAsf')])
+def test_main_11(capsys, test):
+    """checking the 'main' function when the user gives unauthorized input"""
+    check = 'Invalid character: ' + hl.help_letters_and_numbers(test)
+    assert check in hl.test_help_main_11_12(capsys, test)
+
+
+@pytest.mark.parametrize('test', [('6'), ('7'), ('12'),
+                                  ('21'), ('12345'), ('3536')])
+def test_main_12(capsys, test):
+    """checking the 'main' function when the user gives unauthorized input"""
+    check = 'Invalid expression: operator missed'
+    assert check in hl.test_help_main_11_12(capsys, test)
+
+
+@pytest.mark.parametrize('test', [('4'), ('5'), ('dasf'),
+                                  ('ASD'), ('1p'), ('2c'),
+                                  ('3q'), ('65x')])
+def test_main_13(capsys, test):
+    """checking the "main" function when the user
+       gives an unauthorized input in the main menu"""
+    check = 'Invalid input!'
+    assert check in hl.test_help_main_13(capsys, test)
