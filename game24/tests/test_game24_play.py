@@ -144,3 +144,13 @@ def test_play_19(capsys):
 Total 0 hands solved with hint
 Total 11 hands failed to solve"""
     assert check in hl.test_help_play_19(capsys)
+
+
+def test_play_20(capsys):
+    """checking the 'play' function, when the user skips the task,
+       asks the program for help twice, gives the correct answer,
+       skips the rest of the tasks and exits"""
+    check = """Total 0 hands solved
+Total 1 hands solved with hint
+Total 12 hands failed to solve"""
+    assert check in hl.test_help_play_20(capsys), hl.test_help_play_20(capsys)

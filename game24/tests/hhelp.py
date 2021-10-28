@@ -393,6 +393,23 @@ def test_help_play_19(capsys):
         return out
 
 
+def test_help_play_20(capsys):
+    """checking the 'play' function, when the user skips the task,
+       asks the program for help twice, gives the correct answer,
+       skips the rest of the tasks and exits"""
+    g_g = MockGame1()
+    answers = (i for i in ('s', 'h', 'h',
+                           '12 + 12 + 12 - 12',
+                           's', 's', 's', 's', 's', 's',
+                           's', 's', 's', 's', 's', 's', 'q'))
+    with mock.patch.object(builtins, 'input', lambda _: next(answers)):
+        with pytest.raises(SystemExit):
+            g_g.play()
+        out, err = capsys.readouterr()
+        print(err)
+        return out
+
+
 def test_help_main_1(capsys):
     """checking the 'main' function when the user launches the game"""
     answers = (i for i in ('1', 's', '12 + 12 + 12 - 12',
