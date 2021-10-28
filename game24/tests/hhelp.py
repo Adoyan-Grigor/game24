@@ -629,7 +629,7 @@ def test_help_ui_menu_and_expr_negative_2(capsys, test, menu, choices):
     g_g.new_hand()
     answers = (i for i in (test, 'q'))
     with mock.patch.object(builtins, 'input', lambda _: next(answers)):
-        g_c.ui_menu_and_expr(menu, choices)
+        g_g.ui_menu_and_expr(menu, choices)
         out, err = capsys.readouterr()
         print(err)
         return out
