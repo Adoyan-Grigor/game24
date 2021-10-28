@@ -111,13 +111,12 @@ def test_main_13(capsys, test):
     assert check in hl.test_help_main_13(capsys, test)
 
 
-@pytest.mark.xfail
 def test_main_14(capsys):
     """checking the 'main' function, when the user starts the game,
     skips the task, solves the equation correctly, fails to solve
     the same equation again, asks for help, solves the equation
     correctly, skips the remaining tasks and exits the game"""
-    check = """Total 1 hands solved
-Total 0 hands solved with hint
-Total 11 hands failed to solve"""
-    assert check in hl.test_help_main_14(capsys), hl.test_help_main_14(capsys)
+    check = """Total 0 hands solved
+Total 1 hands solved with hint
+Total 12 hands failed to solve"""
+    assert check in hl.test_help_main_14(capsys)
