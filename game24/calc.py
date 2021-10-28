@@ -5,8 +5,8 @@ from __future__ import absolute_import, print_function, division
 from fractions import Fraction
 
 try:
-    import __builtin__
-    cmp = getattr(__builtin__, 'cmp')
+    import builtins
+    cmp = getattr(builtins, 'cmp')
 except (ImportError, AttributeError):
     def cmp(x, y): return (x > y) - (x < y)
 
